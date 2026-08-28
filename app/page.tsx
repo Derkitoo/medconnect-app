@@ -177,9 +177,7 @@ const endDateFromDuration = (startDate: string, duration: string) => {
 function Brand({ role, patientName }: { role: Role; patientName: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#176b50] text-xl font-black text-white">
-        M
-      </span>
+      <img src="/icons/icon-192.png" alt="" className="h-11 w-11 rounded-2xl shadow-sm" />
       <div>
         <p className="text-xl font-black tracking-[-.03em]">MedConnect</p>
         <p className="text-xs font-semibold text-[#60766e]">
