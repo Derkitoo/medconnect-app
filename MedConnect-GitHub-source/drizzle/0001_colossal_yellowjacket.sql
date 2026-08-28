@@ -1,1 +1,0 @@
-ALTER TABLE `families` ADD `state_json` text;
