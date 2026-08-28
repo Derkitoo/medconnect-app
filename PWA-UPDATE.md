@@ -1,6 +1,6 @@
 # Mise à jour PWA MedConnect
 
-Cette mise à jour ajoute le manifeste installable, le service worker sécurisé, le mode hors connexion, le pack d'icônes et le logo dans l'interface.
+Cette mise à jour ajoute le manifeste installable, le service worker sécurisé, le mode hors connexion et le logo final MedConnect : bouclier et monogramme M, sans croix ni symbole médical générique.
 
 Elle ne modifie ni `wrangler.jsonc`, ni l'identifiant D1, ni les routes API.
 
