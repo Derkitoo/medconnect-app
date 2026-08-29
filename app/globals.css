@@ -1,12 +1,69 @@
 @import 'tailwindcss';
-:root { --background: #f4f7f5; --foreground: #142f27; }
+
+/* ============================================================
+   Design tokens — identité MedConnect (vert santé)
+   Échelle consolidée : couleurs principales aux valeurs exactes
+   d'origine ; quasi-doublons repliés sur le token canonique.
+   Rethémer l'app = éditer ce seul bloc.
+   ============================================================ */
+@theme {
+  /* Texte : forêt profond → vert clair */
+  --color-ink:      #17362d;  /* texte principal, nav */
+  --color-ink-2:    #37554b;  /* texte secondaire sombre */
+  --color-ink-deep: #10271f;  /* le plus sombre */
+  --color-muted:    #60766e;  /* texte secondaire */
+  --color-muted-2:  #71847d;  /* texte tertiaire */
+  --color-faint:    #90c8ae;  /* vert clair sur fond sombre */
+  --color-faint-2:  #c6d8d1;  /* nav : onglet inactif */
+
+  /* Marque */
+  --color-brand:        #176b50;  /* action, liens, états actifs, eyebrows */
+  --color-brand-deep:   #0f5a42;  /* survol / pressé */
+  --color-brand-bright: #2e9b6c;  /* accent vert vif */
+  --color-brand-soft:   #e2f5ea;  /* fond teinté marque */
+
+  /* Surfaces & lignes */
+  --color-bg:          #f4f7f5;  /* fond de page */
+  --color-surface:     #ffffff;  /* cartes */
+  --color-surface-2:   #edf2ef;  /* remplissages subtils, puces */
+  --color-surface-3:   #f3f7f4;  /* remplissage très clair */
+  --color-line:        #dce7e2;  /* bordure standard */
+  --color-line-strong: #ccdcd5;  /* bordure plus marquée */
+
+  /* Sémantiques : attention (ambre) */
+  --color-warn-bg:     #fff5dd;
+  --color-warn-border: #efc16d;
+  --color-warn-accent: #e5a72e;
+  --color-warn-ink:    #765b2b;
+
+  /* Sémantiques : alerte (rouge) */
+  --color-danger:      #a84747;
+  --color-danger-bg:   #fff0eb;
+  --color-danger-soft: #ef8d73;
+
+  /* Focus */
+  --color-accent:      #d8f36a;  /* citron */
+}
+
+:root { --background: var(--color-bg); --foreground: var(--color-ink); }
+
 * { box-sizing: border-box; }
 html { background: var(--background); }
-body { margin: 0; background: radial-gradient(circle at 50% -10%, #ffffff 0, #f4f7f5 38rem); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+body {
+  margin: 0;
+  background: radial-gradient(circle at 50% -10%, #ffffff 0, var(--color-bg) 38rem);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 button { cursor: pointer; }
-button:focus-visible { outline: 4px solid #d8f36a; outline-offset: 3px; }
+button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
 input, select, textarea { outline: none; transition: border-color .2s, box-shadow .2s; }
-input:focus, select:focus, textarea:focus { border-color: #4c9a7c !important; box-shadow: 0 0 0 4px rgba(76,154,124,.12); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-brand) !important;
+  box-shadow: 0 0 0 4px rgba(23, 107, 80, .12);
+}
 @media (prefers-reduced-motion: no-preference) {
   button { transition: transform .18s ease, background-color .18s ease, color .18s ease, box-shadow .18s ease; }
 }

@@ -144,11 +144,11 @@ const statusText = {
   refused: "Refusée",
 };
 const statusColor = {
-  confirmed: "bg-[#2e9b6c]",
-  pending: "bg-[#e5a72e]",
-  upcoming: "bg-[#cbd7d2]",
-  missed: "bg-[#e5a72e]",
-  refused: "bg-[#c76565]",
+  confirmed: "bg-brand-bright",
+  pending: "bg-warn-accent",
+  upcoming: "bg-line",
+  missed: "bg-warn-accent",
+  refused: "bg-danger",
 };
 
 const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
@@ -174,13 +174,42 @@ const endDateFromDuration = (startDate: string, duration: string) => {
   return date.toISOString().slice(0, 10);
 };
 
+type NavIconName = "home" | "pill" | "clock" | "feedback" | "patient";
+
+function NavIcon({ name, className }: { name: NavIconName; className?: string }) {
+  const common = {
+    className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.9,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+  switch (name) {
+    case "home":
+      return (<svg {...common}><path d="M4 11.5 12 4l8 7.5" /><path d="M6 10.2V20h12v-9.8" /><path d="M10 20v-5h4v5" /></svg>);
+    case "pill":
+      return (<svg {...common}><path d="M10.6 4.7 4.7 10.6a4.6 4.6 0 0 0 6.5 6.5l5.9-5.9a4.6 4.6 0 0 0-6.5-6.5Z" /><path d="M7.6 7.6l6.5 6.5" /></svg>);
+    case "clock":
+      return (<svg {...common}><circle cx="12" cy="12" r="8.4" /><path d="M12 7.6V12l3 1.8" /></svg>);
+    case "feedback":
+      return (<svg {...common}><path d="M20 12.5a6.5 6.5 0 0 1-9.3 5.9L4.5 20l1.6-6.2A6.5 6.5 0 1 1 20 12.5Z" /><path d="M9.2 11.7h5.6M9.2 14.2h3.4" /></svg>);
+    case "patient":
+      return (<svg {...common}><circle cx="12" cy="8" r="3.6" /><path d="M5.6 19.5a6.4 6.4 0 0 1 12.8 0" /></svg>);
+    default:
+      return null;
+  }
+}
+
 function Brand({ role, patientName }: { role: Role; patientName: string }) {
   return (
     <div className="flex items-center gap-3">
       <img src="/icons/icon-192.png" alt="" className="h-11 w-11 rounded-2xl shadow-sm" />
       <div>
-        <p className="text-xl font-black tracking-[-.03em]">MedConnect</p>
-        <p className="text-xs font-semibold text-[#60766e]">
+        <p className="text-lg font-extrabold tracking-[-.02em] text-ink">MedConnect</p>
+        <p className="text-xs font-medium text-muted">
           Bonjour {role === "patient" ? patientName : "Aidant"}
         </p>
       </div>
@@ -202,55 +231,55 @@ function DoseList({
   onOutcome?: (dose: Dose, outcome: "missed" | "refused" | "postponed") => void;
 }) {
   return (
-    <div className="rounded-3xl border border-[#dce7e2] bg-white p-2 shadow-sm">
+    <div className="rounded-3xl border border-line bg-white p-2 shadow-sm">
       {doses.map((dose, index) => (
         <div
           key={dose.id}
-          className={`flex items-center gap-4 p-4 ${index < doses.length - 1 ? "border-b border-[#edf2ef]" : ""}`}
+          className={`flex items-center gap-4 p-4 ${index < doses.length - 1 ? "border-b border-surface-2" : ""}`}
         >
           <span
             className={`h-3 w-3 shrink-0 rounded-full ${statusColor[dose.status]}`}
           />
           <div className="w-14">
-            <p className="text-lg font-black">{dose.time}</p>
+            <p className="text-lg font-bold">{dose.time}</p>
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-extrabold">{dose.label}</p>
-            <p className="mt-0.5 break-words text-xs font-medium leading-relaxed text-[#71847d]">
+            <p className="mt-0.5 break-words text-xs font-medium leading-relaxed text-muted-2">
               {dose.detail}
             </p>
             {onEdit && (
               <p
-                className={`mt-1 text-xs font-bold ${dose.stock <= 3 ? "text-[#a84747]" : "text-[#71847d]"}`}
+                className={`mt-1 text-xs font-bold ${dose.stock <= 3 ? "text-danger" : "text-muted-2"}`}
               >
                 Stock : {dose.stock} prise{dose.stock > 1 ? "s" : ""}
               </p>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-sm font-bold text-[#61776f]">
+            <p className="text-sm font-bold text-muted">
               {statusText[dose.status]}
             </p>
             {onEdit && (
               <details className="relative">
                 <summary
                   aria-label={`Actions pour ${dose.label}`}
-                  className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-full text-lg font-black tracking-widest text-[#71847d] transition hover:bg-[#edf5f1]"
+                  className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-full text-lg font-bold tracking-widest text-muted-2 transition hover:bg-surface-2"
                 >
                   •••
                 </summary>
-                <div className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-2xl border border-[#dce7e2] bg-white p-2 text-left shadow-[0_14px_40px_rgba(23,54,45,.16)]">
+                <div className="absolute right-0 z-20 mt-2 w-52 overflow-hidden rounded-2xl border border-line bg-white p-2 text-left shadow-[0_14px_40px_rgba(23,54,45,.16)]">
                   {onConfirm && dose.status !== "confirmed" && (
                     <button
                       onClick={() => onConfirm(dose.id)}
-                      className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#176b50] hover:bg-[#edf5f1]"
+                      className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-brand hover:bg-surface-2"
                     >
                       Marquer comme prise
                     </button>
                   )}
                   <button
                     onClick={() => onEdit(dose)}
-                    className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#37554b] hover:bg-[#edf5f1]"
+                    className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-ink-2 hover:bg-surface-2"
                   >
                     Modifier la prise
                   </button>
@@ -258,28 +287,28 @@ function DoseList({
                     <>
                       <button
                         onClick={() => onOutcome(dose, "postponed")}
-                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#37554b] hover:bg-[#edf5f1]"
+                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-ink-2 hover:bg-surface-2"
                       >
                         Reporter l’horaire
                       </button>
                       <button
                         onClick={() => onOutcome(dose, "missed")}
-                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#865e19] hover:bg-[#fff5dd]"
+                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-warn-ink hover:bg-warn-bg"
                       >
                         Marquer comme oubliée
                       </button>
                       <button
                         onClick={() => onOutcome(dose, "refused")}
-                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#a84747] hover:bg-[#fff0eb]"
+                        className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-danger hover:bg-danger-bg"
                       >
                         Marquer comme refusée
                       </button>
                     </>
                   )}
-                  <div className="my-1 border-t border-[#edf2ef]" />
+                  <div className="my-1 border-t border-surface-2" />
                   <button
                     onClick={() => onDelete?.(dose)}
-                    className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-[#a84747] hover:bg-[#fff0eb]"
+                    className="w-full rounded-xl px-3 py-3 text-left text-sm font-bold text-danger hover:bg-danger-bg"
                   >
                     Supprimer définitivement
                   </button>
@@ -297,37 +326,37 @@ function MedicationVisual({ form, small = false }: { form: string; small?: boole
   const value = form.toLowerCase();
   const size = small ? "h-9 w-9" : "h-12 w-12";
   if (value.includes("gélule") || value.includes("capsule"))
-    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-[#edf5f1]`}><span className="h-4 w-7 rotate-[-25deg] rounded-full bg-[linear-gradient(90deg,#176b50_50%,#d8f36a_50%)] shadow-sm" /></span>;
+    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-surface-2`}><span className="h-4 w-7 rotate-[-25deg] rounded-full bg-[linear-gradient(90deg,#176b50_50%,#d8f36a_50%)] shadow-sm" /></span>;
   if (value.includes("solution") || value.includes("sirop") || value.includes("ml"))
-    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-[#e8f3fa] text-xl`}>💧</span>;
+    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-surface-2 text-xl`}>💧</span>;
   if (value.includes("sachet") || value.includes("poudre"))
-    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-[#fff5dd] text-xl`}>▱</span>;
-  return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-[#edf5f1]`}><span className="h-5 w-5 rounded-full border-2 border-[#176b50] bg-white shadow-sm" /></span>;
+    return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-warn-bg text-xl`}>▱</span>;
+  return <span aria-hidden className={`grid ${size} place-items-center rounded-2xl bg-surface-2`}><span className="h-5 w-5 rounded-full border-2 border-brand bg-white shadow-sm" /></span>;
 }
 
 function VirtualPillbox({ doses, prescription }: { doses: Dose[]; prescription: Prescription }) {
   return (
-    <div className="rounded-[2rem] bg-[#17362d] p-5 text-white shadow-[0_18px_45px_rgba(23,54,45,.16)]">
+    <div className="rounded-[2rem] bg-ink p-5 text-white shadow-[0_18px_45px_rgba(23,54,45,.16)]">
       <div className="flex items-end justify-between gap-3">
-        <div><p className="text-xs font-black uppercase tracking-[.14em] text-[#b9d6ca]">Pilulier virtuel</p><h2 className="mt-1 text-2xl font-black">Ma journée</h2></div>
-        <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-black">{doses.length} compartiment{doses.length > 1 ? "s" : ""}</span>
+        <div><p className="text-xs font-bold uppercase tracking-[.14em] text-line-strong">Pilulier virtuel</p><h2 className="mt-1 text-2xl font-extrabold">Ma journée</h2></div>
+        <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">{doses.length} compartiment{doses.length > 1 ? "s" : ""}</span>
       </div>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {doses.map((dose) => {
           const medicines = prescription?.items.filter((item) => !item.asNeeded && item.times.includes(dose.time)) ?? [];
-          const tone = dose.status === "confirmed" ? "border-[#79c79f] bg-[#246c53]" : dose.status === "upcoming" ? "border-white/10 bg-white/5" : dose.status === "missed" || dose.status === "refused" ? "border-[#ef8d73] bg-[#6b3b32]" : "border-[#d8f36a] bg-white/10";
+          const tone = dose.status === "confirmed" ? "border-faint bg-brand" : dose.status === "upcoming" ? "border-white/10 bg-white/5" : dose.status === "missed" || dose.status === "refused" ? "border-danger-soft bg-danger" : "border-accent bg-white/10";
           return <details key={dose.id} className={`rounded-2xl border p-4 ${tone}`}>
             <summary className="cursor-pointer list-none">
-              <span className="flex items-center justify-between"><span className="text-2xl font-black">{dose.time}</span><span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-black">{statusText[dose.status]}</span></span>
-              <span className="mt-2 block text-sm font-bold text-[#d5e4de]">{medicines.length || 1} médicament{medicines.length > 1 ? "s" : ""} · voir le contenu</span>
+              <span className="flex items-center justify-between"><span className="text-2xl font-extrabold">{dose.time}</span><span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-bold">{statusText[dose.status]}</span></span>
+              <span className="mt-2 block text-sm font-bold text-line">{medicines.length || 1} médicament{medicines.length > 1 ? "s" : ""} · voir le contenu</span>
             </summary>
             <div className="mt-3 space-y-2 border-t border-white/15 pt-3">
-              {medicines.length ? medicines.map((item) => <div key={item.id} className="flex items-center gap-3 rounded-xl bg-white/10 p-3"><MedicationVisual form={item.form} small /><div><p className="font-black">{item.name}</p><p className="text-xs font-bold text-[#d5e4de]">{quantityLabel(item.quantity)} {item.form} · {item.dosage}</p></div></div>) : <p className="text-sm font-medium text-[#d5e4de]">{dose.detail}</p>}
+              {medicines.length ? medicines.map((item) => <div key={item.id} className="flex items-center gap-3 rounded-xl bg-white/10 p-3"><MedicationVisual form={item.form} small /><div><p className="font-bold">{item.name}</p><p className="text-xs font-bold text-line">{quantityLabel(item.quantity)} {item.form} · {item.dosage}</p></div></div>) : <p className="text-sm font-medium text-line">{dose.detail}</p>}
             </div>
           </details>;
         })}
       </div>
-      <p className="mt-4 text-xs font-bold text-[#b9d6ca]">Représentation indicative du programme. Vérifiez toujours le nom et le dosage.</p>
+      <p className="mt-4 text-xs font-bold text-line-strong">Représentation indicative du programme. Vérifiez toujours le nom et le dosage.</p>
     </div>
   );
 }
@@ -386,35 +415,35 @@ function PatientView({
   return (
     <section className="mx-auto max-w-lg px-5 pb-40">
       {readOnlyPreview && (
-        <div className="mb-4 rounded-2xl border border-[#90c8ae] bg-[#e2f5ea] p-4 text-sm font-bold text-[#176b50]">
+        <div className="mb-4 rounded-2xl border border-faint bg-brand-soft p-4 text-sm font-bold text-brand">
           Aperçu Aidant : vous voyez exactement l’écran du patient. Les actions Patient sont désactivées dans cet aperçu.
         </div>
       )}
       {patientReminder && !readOnlyPreview && (
-        <div className="mb-5 animate-pulse rounded-[2rem] border-2 border-[#ef8d73] bg-[#fff0eb] p-5 text-center shadow-[0_16px_40px_rgba(169,70,48,.16)]">
-          <p className="text-sm font-black uppercase tracking-[.12em] text-[#a94630]">Rappel de votre aidant</p>
-          <p className="mt-2 text-2xl font-black text-[#7d3524]">{patientReminder.message}</p>
-          <p className="mt-2 text-sm font-bold text-[#9b5848]">Confirmez uniquement après avoir réellement pris vos médicaments.</p>
+        <div className="mb-5 animate-pulse rounded-[2rem] border-2 border-danger-soft bg-danger-bg p-5 text-center shadow-[0_16px_40px_rgba(169,70,48,.16)]">
+          <p className="text-sm font-bold uppercase tracking-[.12em] text-danger">Rappel de votre aidant</p>
+          <p className="mt-2 text-2xl font-extrabold text-danger">{patientReminder.message}</p>
+          <p className="mt-2 text-sm font-bold text-danger">Confirmez uniquement après avoir réellement pris vos médicaments.</p>
         </div>
       )}
       {awaitingSchedule ? (
-        <div className="rounded-3xl bg-[#17362d] p-6 text-white shadow-[0_18px_50px_rgba(23,54,45,.16)]">
-          <p className="text-sm font-black uppercase tracking-wide text-[#b9d6ca]">
+        <div className="rounded-3xl bg-ink p-6 text-white shadow-[0_18px_50px_rgba(23,54,45,.16)]">
+          <p className="text-sm font-bold uppercase tracking-wide text-line-strong">
             Traitement reçu
           </p>
-          <h1 className="mt-1 text-2xl font-black">Horaires en préparation</h1>
-          <p className="mt-2 text-sm font-medium text-[#d5e4de]">
+          <h1 className="mt-1 text-2xl font-extrabold">Horaires en préparation</h1>
+          <p className="mt-2 text-sm font-medium text-line">
             Votre aidant vérifie encore les horaires. Aucun bouton de prise n’est
             actif pour le moment.
           </p>
           <div className="mt-5 space-y-2 border-t border-white/15 pt-5">
             {prescription.items.map((item) => (
               <article key={item.id} className="rounded-2xl bg-white/10 p-4">
-                <p className="font-black">{item.name}</p>
-                <p className="mt-1 text-sm font-bold text-[#d5e4de]">
+                <p className="font-bold">{item.name}</p>
+                <p className="mt-1 text-sm font-bold text-line">
                   {item.dosage} · {item.quantity} {item.form}
                 </p>
-                <p className="mt-1 text-sm font-medium text-[#b9d6ca]">
+                <p className="mt-1 text-sm font-medium text-line-strong">
                   {item.asNeeded
                     ? "Si besoin · aucun rappel automatique"
                     : [item.frequencyText, item.durationText]
@@ -425,7 +454,7 @@ function PatientView({
             ))}
           </div>
           {prescription.notes && (
-            <p className="mt-4 whitespace-pre-line rounded-xl bg-[#fff5dd] p-3 text-sm font-medium text-[#765b2b]">
+            <p className="mt-4 whitespace-pre-line rounded-xl bg-warn-bg p-3 text-sm font-medium text-warn-ink">
               {prescription.notes}
             </p>
           )}
@@ -436,14 +465,14 @@ function PatientView({
             <span className="absolute -right-12 -top-14 h-40 w-40 rounded-full bg-white/5" />
             <div className="mb-8 flex items-start justify-between">
               <div>
-                <p className="text-sm font-semibold text-[#b9d6ca]">
+                <p className="text-sm font-semibold text-line-strong">
                   PROCHAINE PRISE
                 </p>
-                <p className="mt-1 text-5xl font-black tracking-tight">
+                <p className="mt-1 text-5xl font-bold tracking-tight">
                   {next.time}
                 </p>
               </div>
-              <span className="relative rounded-full bg-[#d8f36a] px-4 py-2 text-sm font-extrabold text-[#17362d] shadow-[0_8px_20px_rgba(216,243,106,.2)]">
+              <span className="relative rounded-full bg-accent px-4 py-2 text-sm font-extrabold text-ink shadow-[0_8px_20px_rgba(216,243,106,.2)]">
                 {next.label}
               </span>
             </div>
@@ -452,43 +481,43 @@ function PatientView({
                 <p className="text-xl font-extrabold">
                   Traitement de {next.label.toLowerCase()}
                 </p>
-                <p className="mt-1 text-base text-[#d5e4de]">{next.detail}</p>
+                <p className="mt-1 text-base text-line">{next.detail}</p>
               </div>
               <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-white/10 text-3xl">
                 💊
               </div>
             </div>
             <details className="relative mt-5 rounded-2xl bg-white/10 p-4" open>
-              <summary className="cursor-pointer list-none font-black text-white">
+              <summary className="cursor-pointer list-none font-bold text-white">
                 Médicaments à prendre ({medicinesForNext.length || 1})
               </summary>
               <div className="mt-3 space-y-2 border-t border-white/15 pt-3">
                 {medicinesForNext.length > 0 ? medicinesForNext.map((item) => (
                   <div key={item.id} className="rounded-xl bg-white/10 p-3">
-                    <p className="font-black">{item.name} · {item.dosage}</p>
-                    <p className="mt-1 text-sm font-medium text-[#d5e4de]">{quantityLabel(item.quantity)} {item.form}{item.quantity > 1 ? "s" : ""} par prise</p>
+                    <p className="font-bold">{item.name} · {item.dosage}</p>
+                    <p className="mt-1 text-sm font-medium text-line">{quantityLabel(item.quantity)} {item.form}{item.quantity > 1 ? "s" : ""} par prise</p>
                   </div>
-                )) : <p className="text-sm font-medium text-[#d5e4de]">{next.detail}</p>}
+                )) : <p className="text-sm font-medium text-line">{next.detail}</p>}
               </div>
             </details>
           </div>
           {readOnlyPreview ? (
-            <div className="flex min-h-24 w-full items-center justify-center rounded-[2rem] border-2 border-dashed border-[#90c8ae] bg-white px-6 text-center text-lg font-black text-[#176b50]">
+            <div className="flex min-h-24 w-full items-center justify-center rounded-[2rem] border-2 border-dashed border-faint bg-white px-6 text-center text-lg font-bold text-brand">
               Bouton de confirmation visible uniquement sur l’accès Patient
             </div>
           ) : canConfirmNow ? (
-            <button onClick={() => confirm(next.id)} className="group flex min-h-32 w-full items-center justify-center gap-4 rounded-[2rem] border-4 border-[#17362d] bg-[#d8f36a] px-5 text-left text-[#17362d] shadow-[0_16px_36px_rgba(23,54,45,.24)] hover:-translate-y-0.5 hover:bg-[#e3fa84] active:translate-y-0 active:scale-[.98]">
-              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-[#17362d] text-3xl text-white shadow-lg">✓</span>
-              <span><span className="block text-sm font-black uppercase tracking-[.12em]">Appuyez ici</span><span className="mt-1 block text-2xl font-black leading-tight">Confirmer ma prise</span><span className="mt-1 block text-sm font-bold">J’ai pris tous les médicaments affichés</span></span>
+            <button onClick={() => confirm(next.id)} className="group flex min-h-32 w-full items-center justify-center gap-4 rounded-[2rem] border-4 border-ink bg-accent px-5 text-left text-ink shadow-[0_16px_36px_rgba(23,54,45,.24)] hover:-translate-y-0.5 hover:bg-accent active:translate-y-0 active:scale-[.98]">
+              <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-ink text-3xl text-white shadow-lg">✓</span>
+              <span><span className="block text-sm font-bold uppercase tracking-[.12em]">Appuyez ici</span><span className="mt-1 block text-2xl font-extrabold leading-tight">Confirmer ma prise</span><span className="mt-1 block text-sm font-bold">J’ai pris tous les médicaments affichés</span></span>
             </button>
           ) : (
-            <div className="rounded-[2rem] border-2 border-[#dce7e2] bg-white p-5 text-center">
-              <p className="text-lg font-black text-[#37554b]">Confirmation disponible à {next.time}</p>
-              <p className="mt-1 text-sm font-medium text-[#71847d]">La prise ne peut pas être validée avant l’heure prévue.</p>
+            <div className="rounded-[2rem] border-2 border-line bg-white p-5 text-center">
+              <p className="text-lg font-bold text-ink-2">Confirmation disponible à {next.time}</p>
+              <p className="mt-1 text-sm font-medium text-muted-2">La prise ne peut pas être validée avant l’heure prévue.</p>
             </div>
           )}
           {upcomingDoses.length > 0 && (
-            <div className="mt-5 overflow-hidden rounded-3xl border border-[#dce7e2] bg-white shadow-sm">
+            <div className="mt-5 overflow-hidden rounded-3xl border border-line bg-white shadow-sm">
               <button
                 type="button"
                 aria-expanded={showUpcoming}
@@ -496,36 +525,36 @@ function PatientView({
                 className="flex w-full items-center justify-between gap-4 p-5 text-left"
               >
                 <span>
-                  <span className="block text-lg font-black">
+                  <span className="block text-lg font-bold">
                     Prochaines prises
                   </span>
-                  <span className="mt-1 block text-sm font-bold text-[#60766e]">
+                  <span className="mt-1 block text-sm font-bold text-muted">
                     Consulter sans confirmer · {upcomingDoses.length} prévue{upcomingDoses.length > 1 ? "s" : ""}
                   </span>
                 </span>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf5f1] text-xl font-black text-[#176b50]">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-xl font-bold text-brand">
                   {showUpcoming ? "−" : "+"}
                 </span>
               </button>
               {showUpcoming && (
-                <div className="border-t border-[#edf2ef] px-5 pb-2">
+                <div className="border-t border-surface-2 px-5 pb-2">
                   {upcomingDoses.map((dose, index) => (
                     <article
                       key={dose.id}
-                      className={`py-5 ${index < upcomingDoses.length - 1 ? "border-b border-[#edf2ef]" : ""}`}
+                      className={`py-5 ${index < upcomingDoses.length - 1 ? "border-b border-surface-2" : ""}`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="rounded-xl bg-[#17362d] px-3 py-2 text-lg font-black text-white">
+                        <span className="rounded-xl bg-ink px-3 py-2 text-lg font-bold text-white">
                           {dose.time}
                         </span>
                         <div>
-                          <p className="font-black">{dose.label}</p>
-                          <p className="text-xs font-bold uppercase tracking-wide text-[#71847d]">
+                          <p className="font-bold">{dose.label}</p>
+                          <p className="text-xs font-bold uppercase tracking-wide text-muted-2">
                             Consultation uniquement
                           </p>
                         </div>
                       </div>
-                      <p className="mt-3 text-base font-bold leading-relaxed text-[#37554b]">
+                      <p className="mt-3 text-base font-bold leading-relaxed text-ink-2">
                         {dose.detail}
                       </p>
                     </article>
@@ -536,14 +565,14 @@ function PatientView({
           )}
         </>
       ) : (
-        <div className="rounded-3xl border-2 border-[#90c8ae] bg-[#e2f5ea] p-8 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#176b50] text-3xl font-black text-white">
+        <div className="rounded-3xl border-2 border-faint bg-brand-soft p-8 text-center">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-brand text-3xl font-extrabold text-white">
             ✓
           </div>
-          <p className="mt-4 text-2xl font-black">
+          <p className="mt-4 text-2xl font-extrabold">
             {exceptions ? "Journée enregistrée" : "Journée terminée"}
           </p>
-          <p className="mt-1 font-medium text-[#527066]">
+          <p className="mt-1 font-medium text-muted-2">
             {exceptions
               ? `${exceptions} prise${exceptions > 1 ? "s" : ""} signalée${exceptions > 1 ? "s" : ""} à l’aidant.`
               : "Toutes les prises sont confirmées."}
@@ -551,16 +580,16 @@ function PatientView({
         </div>
       )}
       {!awaitingSchedule && (
-        <details className="mt-5 rounded-2xl border border-[#dce7e2] bg-white p-4">
-          <summary className="flex cursor-pointer list-none items-center justify-between font-black">
-            <span>Options</span><span className={reminders ? "text-[#176b50]" : "text-[#a84747]"}>Rappels {reminders ? "activés ✓" : "désactivés"}</span>
+        <details className="mt-5 rounded-2xl border border-line bg-white p-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between font-bold">
+            <span>Options</span><span className={reminders ? "text-brand" : "text-danger"}>Rappels {reminders ? "activés ✓" : "désactivés"}</span>
           </summary>
-          <div className="mt-4 border-t border-[#edf2ef] pt-4">
-            <button onClick={toggleReminders} className="w-full rounded-xl border border-[#d5e2dc] px-4 py-3 font-black text-[#37554b]">
+          <div className="mt-4 border-t border-surface-2 pt-4">
+            <button onClick={toggleReminders} className="w-full rounded-xl border border-line px-4 py-3 font-bold text-ink-2">
               {reminders ? "Désactiver les rappels" : "Réactiver les rappels"}
             </button>
             {reminders && typeof Notification !== "undefined" && Notification.permission !== "granted" && (
-              <button onClick={enableReminders} className="mt-2 w-full rounded-xl bg-[#176b50] px-4 py-3 font-black text-white">Autoriser les notifications du téléphone</button>
+              <button onClick={enableReminders} className="mt-2 w-full rounded-xl bg-brand px-4 py-3 font-bold text-white">Autoriser les notifications du téléphone</button>
             )}
           </div>
         </details>
@@ -568,20 +597,20 @@ function PatientView({
       <button
         onClick={requestHelp}
         disabled={!!help || readOnlyPreview}
-        className={`mt-3 w-full rounded-2xl border-2 px-5 py-4 text-lg font-extrabold ${help ? "border-[#efc16d] bg-[#fff5dd] text-[#865e19]" : "border-[#d5e2dc] bg-white text-[#37554b]"}`}
+        className={`mt-3 w-full rounded-2xl border-2 px-5 py-4 text-lg font-extrabold ${help ? "border-warn-border bg-warn-bg text-warn-ink" : "border-line bg-white text-ink-2"}`}
       >
         {readOnlyPreview ? "Demande d’aide disponible côté Patient" : help ? "Votre aidant a été prévenu ✓" : "J’ai une question"}
       </button>
       {!awaitingSchedule && (
         <div className="mt-8">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-lg font-black">Aujourd’hui</h2>
-            <span className="text-sm font-bold text-[#608076]">
+            <h2 className="text-lg font-bold">Aujourd’hui</h2>
+            <span className="text-sm font-bold text-muted">
               {done} prise{done > 1 ? "s" : ""} sur {doses.length}
             </span>
           </div>
           <VirtualPillbox doses={doses} prescription={prescription} />
-          <p className="mt-2 text-center text-xs font-bold text-[#71847d]">Le pilulier est informatif. Seul le grand bouton confirme une prise.</p>
+          <p className="mt-2 text-center text-xs font-bold text-muted-2">Le pilulier est informatif. Seul le grand bouton confirme une prise.</p>
         </div>
       )}
     </section>
@@ -718,45 +747,45 @@ function AidantView({
     <section className="mx-auto max-w-6xl px-5 pb-40">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-black uppercase tracking-[.14em] text-[#176b50]">Tableau de bord Aidant</p>
-          <h1 className="mt-1 text-3xl font-black tracking-[-.035em] sm:text-4xl">Suivi de {patientName}</h1>
-          <p className="mt-2 font-medium text-[#60766e]">Vue d’ensemble du traitement et des alertes du jour.</p>
+          <p className="text-sm font-bold uppercase tracking-[.14em] text-brand">Tableau de bord Aidant</p>
+          <h1 className="mt-1 text-3xl font-extrabold tracking-[-.035em] sm:text-4xl">Suivi de {patientName}</h1>
+          <p className="mt-2 font-medium text-muted">Vue d’ensemble du traitement et des alertes du jour.</p>
         </div>
-        <button onClick={() => setShareOpen(true)} className="rounded-2xl bg-[#17362d] px-5 py-3.5 font-black text-white shadow-[0_12px_28px_rgba(23,54,45,.16)]">
+        <button onClick={() => setShareOpen(true)} className="rounded-2xl bg-ink px-5 py-3.5 font-bold text-white shadow-[0_12px_28px_rgba(23,54,45,.16)]">
           Partager l’accès patient
         </button>
       </div>
-      {shareOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#10271f]/60 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="share-patient-title">
+      {shareOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-deep/60 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="share-patient-title">
         <div className="max-h-[94vh] w-full max-w-lg overflow-y-auto rounded-t-[2rem] bg-white p-6 shadow-2xl sm:rounded-[2rem] sm:p-8">
-          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[.14em] text-[#176b50]">Accès sécurisé Patient</p><h2 id="share-patient-title" className="mt-1 text-2xl font-black">Scanner ou envoyer le lien</h2></div><button type="button" onClick={() => setShareOpen(false)} aria-label="Fermer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#edf2ef] text-xl font-black">×</button></div>
-          <p className="mt-3 text-sm font-medium text-[#60766e]">Ce lien ouvre uniquement l’espace Patient. Il ne contient jamais la clé d’accès Aidant.</p>
-          <div className="mx-auto mt-5 flex aspect-square w-full max-w-[300px] items-center justify-center rounded-[2rem] border border-[#dce7e2] bg-white p-4 shadow-[0_12px_35px_rgba(35,72,60,.08)]">{qrCode ? <img src={qrCode} alt="QR code de l’accès Patient" className="h-full w-full" /> : <span className="font-bold text-[#71847d]">Création du QR code…</span>}</div>
-          <p className="mt-3 text-center text-sm font-black text-[#37554b]">Le patient scanne ce code avec l’appareil photo de son téléphone.</p>
-          <label className="mt-5 block text-xs font-black uppercase tracking-wider text-[#71847d]">Lien Patient uniquement<input readOnly value={patientUrl} onFocus={(event) => event.currentTarget.select()} className="mt-2 w-full rounded-xl border border-[#ccdcd5] bg-[#f7faf8] px-3 py-3 text-sm font-bold text-[#37554b]" /></label>
-          <div className="mt-4 grid gap-2 sm:grid-cols-2"><button type="button" onClick={copyPatientLink} className="min-h-14 rounded-2xl border-2 border-[#90c8ae] bg-white px-4 font-black text-[#176b50]">{copied ? "Lien copié ✓" : "Copier le lien"}</button><button type="button" onClick={share} className="min-h-14 rounded-2xl bg-[#176b50] px-4 font-black text-white">Partager le lien</button></div>
-          <p className="mt-4 rounded-xl bg-[#fff5dd] p-3 text-xs font-bold text-[#765b2b]">Toute personne possédant ce lien peut ouvrir l’espace Patient. Partagez-le uniquement avec le patient et les personnes de confiance.</p>
+          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-brand">Accès sécurisé Patient</p><h2 id="share-patient-title" className="mt-1 text-2xl font-extrabold">Scanner ou envoyer le lien</h2></div><button type="button" onClick={() => setShareOpen(false)} aria-label="Fermer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-2 text-xl font-bold">×</button></div>
+          <p className="mt-3 text-sm font-medium text-muted">Ce lien ouvre uniquement l’espace Patient. Il ne contient jamais la clé d’accès Aidant.</p>
+          <div className="mx-auto mt-5 flex aspect-square w-full max-w-[300px] items-center justify-center rounded-[2rem] border border-line bg-white p-4 shadow-[0_12px_35px_rgba(35,72,60,.08)]">{qrCode ? <img src={qrCode} alt="QR code de l’accès Patient" className="h-full w-full" /> : <span className="font-bold text-muted-2">Création du QR code…</span>}</div>
+          <p className="mt-3 text-center text-sm font-bold text-ink-2">Le patient scanne ce code avec l’appareil photo de son téléphone.</p>
+          <label className="mt-5 block text-xs font-bold uppercase tracking-wider text-muted-2">Lien Patient uniquement<input readOnly value={patientUrl} onFocus={(event) => event.currentTarget.select()} className="mt-2 w-full rounded-xl border border-line-strong bg-surface-3 px-3 py-3 text-sm font-bold text-ink-2" /></label>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2"><button type="button" onClick={copyPatientLink} className="min-h-14 rounded-2xl border-2 border-faint bg-white px-4 font-bold text-brand">{copied ? "Lien copié ✓" : "Copier le lien"}</button><button type="button" onClick={share} className="min-h-14 rounded-2xl bg-brand px-4 font-bold text-white">Partager le lien</button></div>
+          <p className="mt-4 rounded-xl bg-warn-bg p-3 text-xs font-bold text-warn-ink">Toute personne possédant ce lien peut ouvrir l’espace Patient. Partagez-le uniquement avec le patient et les personnes de confiance.</p>
         </div>
       </div>}
       <div className="mb-6 grid gap-3 sm:grid-cols-3">
         <div className="rounded-3xl border border-white bg-white p-5 shadow-[0_12px_35px_rgba(35,72,60,.07)]">
-          <p className="text-xs font-black uppercase tracking-wider text-[#71847d]">Prises confirmées</p>
-          <p className="mt-2 text-4xl font-black text-[#176b50]">{confirmed}<span className="text-lg text-[#71847d]"> / {doses.length}</span></p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-2">Prises confirmées</p>
+          <p className="mt-2 text-4xl font-extrabold text-brand">{confirmed}<span className="text-lg text-muted-2"> / {doses.length}</span></p>
         </div>
         <div className="rounded-3xl border border-white bg-white p-5 shadow-[0_12px_35px_rgba(35,72,60,.07)]">
-          <p className="text-xs font-black uppercase tracking-wider text-[#71847d]">Alertes actives</p>
-          <p className={`mt-2 text-4xl font-black ${late.length ? "text-[#a66a12]" : "text-[#176b50]"}`}>{late.length}</p>
+          <p className="text-xs font-bold uppercase tracking-wider text-muted-2">Alertes actives</p>
+          <p className={`mt-2 text-4xl font-extrabold ${late.length ? "text-warn-ink" : "text-brand"}`}>{late.length}</p>
         </div>
-        <div className="rounded-3xl bg-[#17362d] p-5 text-white shadow-[0_12px_35px_rgba(23,54,45,.14)]">
-          <p className="text-xs font-black uppercase tracking-wider text-[#b9d6ca]">État du jour</p>
-          <p className="mt-2 text-2xl font-black">{confirmed === doses.length ? "Journée terminée" : late.length ? "À surveiller" : "Tout va bien"}</p>
+        <div className="rounded-3xl bg-ink p-5 text-white shadow-[0_12px_35px_rgba(23,54,45,.14)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-line-strong">État du jour</p>
+          <p className="mt-2 text-2xl font-extrabold">{confirmed === doses.length ? "Journée terminée" : late.length ? "À surveiller" : "Tout va bien"}</p>
         </div>
       </div>
       {help && (
-        <div className="mb-5 rounded-3xl border-2 border-[#ef8d73] bg-[#fff0eb] p-5">
-          <p className="text-sm font-black uppercase tracking-wide text-[#a94630]">
+        <div className="mb-5 rounded-3xl border-2 border-danger-soft bg-danger-bg p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-danger">
             {patientName} a une question
           </p>
-          <p className="mt-1 text-lg font-black">
+          <p className="mt-1 text-lg font-bold">
             Demande reçue à{" "}
             {new Date(help.requestedAt).toLocaleTimeString("fr-FR", {
               hour: "2-digit",
@@ -765,38 +794,38 @@ function AidantView({
           </p>
           <button
             onClick={acknowledgeHelp}
-            className="mt-3 rounded-xl bg-[#a94630] px-4 py-3 text-sm font-black text-white"
+            className="mt-3 rounded-xl bg-danger px-4 py-3 text-sm font-bold text-white"
           >
             J’ai pris contact
           </button>
         </div>
       )}
       {late.length > 0 && (
-        <div className="mb-5 rounded-3xl border-2 border-[#efc16d] bg-[#fff5dd] p-5">
-          <p className="text-sm font-black uppercase tracking-wide text-[#9a6511]">
+        <div className="mb-5 rounded-3xl border-2 border-warn-border bg-warn-bg p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-warn-ink">
             Alerte de retard
           </p>
-          <p className="mt-1 text-lg font-black">
+          <p className="mt-1 text-lg font-bold">
             {late.length} prise{late.length > 1 ? "s" : ""} non confirmée
             {late.length > 1 ? "s" : ""}
           </p>
-          <p className="mt-1 text-sm font-medium text-[#765b2b]">
+          <p className="mt-1 text-sm font-medium text-warn-ink">
             Vérifiez auprès de {patientName} avant toute action.
           </p>
           {typeof Notification !== "undefined" && Notification.permission !== "granted" && (
-            <button type="button" onClick={() => void Notification.requestPermission()} className="mt-3 rounded-xl border border-[#d4a64f] bg-white px-4 py-2.5 text-sm font-black text-[#865e19]">
+            <button type="button" onClick={() => void Notification.requestPermission()} className="mt-3 rounded-xl border border-warn-border bg-white px-4 py-2.5 text-sm font-bold text-warn-ink">
               Autoriser les alertes sur cet appareil
             </button>
           )}
           <div className="mt-4 space-y-2">
             {late.map((dose) => (
               <div key={dose.id} className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 p-3">
-                <div><p className="font-black">{dose.time} · {dose.label}</p><p className="text-xs font-medium text-[#765b2b]">{dose.detail}</p></div>
+                <div><p className="font-bold">{dose.time} · {dose.label}</p><p className="text-xs font-medium text-warn-ink">{dose.detail}</p></div>
                 <button
                   type="button"
                   onClick={() => sendPatientReminder(dose)}
                   disabled={patientReminder?.doseId === dose.id}
-                  className="shrink-0 rounded-xl bg-[#a66a12] px-4 py-3 text-sm font-black text-white disabled:bg-[#90c8ae]"
+                  className="shrink-0 rounded-xl bg-warn-ink px-4 py-3 text-sm font-bold text-white disabled:bg-faint"
                 >
                   {patientReminder?.doseId === dose.id ? "Rappel envoyé ✓" : "Envoyer un rappel"}
                 </button>
@@ -806,53 +835,53 @@ function AidantView({
         </div>
       )}
       {lowStockItems.length > 0 && (
-        <div className="mb-5 rounded-3xl border border-[#d9b6b6] bg-[#fff7f5] p-5">
-          <p className="text-sm font-black uppercase tracking-wide text-[#a84747]">
+        <div className="mb-5 rounded-3xl border border-danger-soft bg-danger-bg p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-danger">
             Stock faible
           </p>
-          <p className="mt-1 font-black">
+          <p className="mt-1 font-bold">
             {lowStockItems.map((item) => `${item.name} (${item.stock} unité${item.stock > 1 ? "s" : ""})`).join(" · ")}
           </p>
-          <p className="mt-1 text-sm font-medium text-[#765b5b]">
+          <p className="mt-1 text-sm font-medium text-muted-2">
             Pensez à vérifier le renouvellement avec la pharmacie.
           </p>
         </div>
       )}
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-black">Programme du jour</h2>
-          <p className="text-sm font-medium text-[#6d817a]">
+          <h2 className="text-xl font-bold">Programme du jour</h2>
+          <p className="text-sm font-medium text-muted-2">
             Synchronisé avec le téléphone Patient
           </p>
         </div>
         <button
           onClick={() => setAdding((v) => !v)}
-          className="rounded-xl bg-[#176b50] px-4 py-3 text-sm font-extrabold text-white"
+          className="rounded-xl bg-brand px-4 py-3 text-sm font-extrabold text-white"
         >
           + Ajouter
         </button>
       </div>
       {(adding || editing) && (
-        <div className="mb-4 grid gap-3 rounded-3xl border border-[#dce7e2] bg-white p-5 sm:grid-cols-[120px_1fr_110px_auto]">
-          <label className="text-sm font-black">
+        <div className="mb-4 grid gap-3 rounded-3xl border border-line bg-white p-5 sm:grid-cols-[120px_1fr_110px_auto]">
+          <label className="text-sm font-bold">
             Horaire
             <input
               value={time}
               onChange={(e) => setTime(e.target.value)}
               type="time"
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3 text-base"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3 text-base"
             />
           </label>
-          <label className="text-sm font-black">
+          <label className="text-sm font-bold">
             Nom de la prise
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
               maxLength={40}
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3 text-base"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3 text-base"
             />
           </label>
-          <label className="text-sm font-black">
+          <label className="text-sm font-bold">
             Stock
             <input
               value={stock}
@@ -862,12 +891,12 @@ function AidantView({
               type="number"
               min="0"
               max="999"
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3 text-base"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3 text-base"
             />
           </label>
           <button
             onClick={editing ? applyEdit : addDose}
-            className="self-end rounded-xl bg-[#176b50] px-5 py-3 font-black text-white"
+            className="self-end rounded-xl bg-brand px-5 py-3 font-bold text-white"
           >
             {editing ? "Mettre à jour" : "Enregistrer"}
           </button>
@@ -880,11 +909,11 @@ function AidantView({
         onDelete={removeDose}
         onOutcome={markOutcome}
       />
-      <div className="mt-7 rounded-3xl border border-[#dce7e2] bg-white p-5">
+      <div className="mt-7 rounded-3xl border border-line bg-white p-5">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="font-black">Délai avant alerte</p>
-            <p className="mt-1 text-sm font-medium text-[#6d817a]">
+            <p className="font-bold">Délai avant alerte</p>
+            <p className="mt-1 text-sm font-medium text-muted-2">
               Prévenir après une prise non confirmée
             </p>
           </div>
@@ -893,7 +922,7 @@ function AidantView({
             onChange={(e) =>
               updateDelay(Number(e.target.value) as 15 | 30 | 60)
             }
-            className="rounded-xl border-0 bg-[#edf5f1] px-4 py-3 font-black text-[#176b50]"
+            className="rounded-xl border-0 bg-surface-2 px-4 py-3 font-bold text-brand"
           >
             <option value={15}>15 min</option>
             <option value={30}>30 min</option>
@@ -904,7 +933,7 @@ function AidantView({
       {confirmed > 0 && (
         <button
           onClick={reset}
-          className="mt-5 w-full rounded-2xl border-2 border-[#d5e2dc] bg-white px-5 py-4 font-extrabold text-[#37554b]"
+          className="mt-5 w-full rounded-2xl border-2 border-line bg-white px-5 py-4 font-extrabold text-ink-2"
         >
           Réinitialiser la journée
         </button>
@@ -923,19 +952,19 @@ function HistoryView({ history }: { history: HistoryEvent[] }) {
   return (
     <section className="mx-auto max-w-lg px-5 pb-32">
       <div className="mb-5">
-        <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+        <p className="text-sm font-bold uppercase tracking-wide text-brand">
           Suivi partagé
         </p>
-        <h1 className="mt-1 text-3xl font-black">Historique des prises</h1>
-        <p className="mt-2 font-medium text-[#657a72]">
+        <h1 className="mt-1 text-3xl font-extrabold">Historique des prises</h1>
+        <p className="mt-2 font-medium text-muted">
           Les confirmations effectuées pendant le pilote apparaissent ici.
         </p>
       </div>
       {history.length === 0 ? (
-        <div className="rounded-3xl border border-[#dce7e2] bg-white p-8 text-center">
+        <div className="rounded-3xl border border-line bg-white p-8 text-center">
           <div className="text-4xl">🕘</div>
-          <p className="mt-3 text-lg font-black">Aucune prise confirmée</p>
-          <p className="mt-1 text-sm font-medium text-[#71847d]">
+          <p className="mt-3 text-lg font-bold">Aucune prise confirmée</p>
+          <p className="mt-1 text-sm font-medium text-muted-2">
             L’historique se remplira automatiquement.
           </p>
         </div>
@@ -944,10 +973,10 @@ function HistoryView({ history }: { history: HistoryEvent[] }) {
           {history.map((event) => (
             <article
               key={event.id}
-              className="flex items-center gap-4 rounded-3xl border border-[#dce7e2] bg-white p-5 shadow-sm"
+              className="flex items-center gap-4 rounded-3xl border border-line bg-white p-5 shadow-sm"
             >
               <span
-                className={`grid h-11 w-11 place-items-center rounded-full text-xl font-black ${event.outcome === "missed" ? "bg-[#fff5dd] text-[#865e19]" : event.outcome === "refused" ? "bg-[#fff0eb] text-[#a84747]" : "bg-[#e2f5ea] text-[#176b50]"}`}
+                className={`grid h-11 w-11 place-items-center rounded-full text-xl font-bold ${event.outcome === "missed" ? "bg-warn-bg text-warn-ink" : event.outcome === "refused" ? "bg-danger-bg text-danger" : "bg-brand-soft text-brand"}`}
               >
                 {event.outcome === "missed"
                   ? "!"
@@ -956,15 +985,15 @@ function HistoryView({ history }: { history: HistoryEvent[] }) {
                     : "✓"}
               </span>
               <div className="flex-1">
-                <p className="font-black">
+                <p className="font-bold">
                   {outcomeLabel[event.outcome || "taken"]} ·{" "}
                   {event.label.toLowerCase()}
                 </p>
-                <p className="mt-1 text-sm font-medium text-[#71847d]">
+                <p className="mt-1 text-sm font-medium text-muted-2">
                   Prévue à {event.scheduledTime}
                 </p>
               </div>
-              <time className="text-sm font-black text-[#176b50]">
+              <time className="text-sm font-bold text-brand">
                 {new Date(event.confirmedAt).toLocaleTimeString("fr-FR", {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -974,7 +1003,7 @@ function HistoryView({ history }: { history: HistoryEvent[] }) {
           ))}
         </div>
       )}
-      <div className="mt-6 rounded-2xl bg-[#edf5f1] p-4 text-sm font-medium text-[#547066]">
+      <div className="mt-6 rounded-2xl bg-surface-2 p-4 text-sm font-medium text-muted-2">
         Une confirmation indique une action déclarée dans l’application, pas une
         preuve médicale d’ingestion.
       </div>
@@ -1437,15 +1466,15 @@ function PrescriptionView({
   return (
     <section className="mx-auto max-w-3xl px-5 pb-32">
       <div className="mb-5">
-        <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+        <p className="text-sm font-bold uppercase tracking-wide text-brand">
           Gestion du traitement
         </p>
-        <h1 className="mt-1 text-3xl font-black">Ordonnance</h1>
-        <p className="mt-2 font-medium text-[#657a72]">
+        <h1 className="mt-1 text-3xl font-extrabold">Ordonnance</h1>
+        <p className="mt-2 font-medium text-muted">
           Saisissez et vérifiez chaque ligne avant de générer le calendrier.
         </p>
       </div>
-      <div className="mb-5 rounded-2xl border border-[#efc16d] bg-[#fff5dd] p-4 text-sm font-medium text-[#765b2b]">
+      <div className="mb-5 rounded-2xl border border-warn-border bg-warn-bg p-4 text-sm font-medium text-warn-ink">
         <strong>Mode pilote :</strong> utilisez uniquement des données fictives.
         L’OCR local aide uniquement à lire le document : il ne remplit pas et ne
         valide jamais le traitement automatiquement.
@@ -1461,18 +1490,18 @@ function PrescriptionView({
       {!scanFile ? (
         <button
           onClick={() => scanInputRef.current?.click()}
-          className="mb-5 w-full rounded-3xl border-2 border-dashed border-[#b8ccc3] bg-[#edf5f1] p-6 text-center text-[#176b50]"
+          className="mb-5 w-full rounded-3xl border-2 border-dashed border-line-strong bg-surface-2 p-6 text-center text-brand"
         >
           <p className="text-3xl">📷</p>
-          <p className="mt-2 font-black">Photographier un document fictif</p>
-          <p className="mt-1 text-sm font-medium text-[#60766e]">
+          <p className="mt-2 font-bold">Photographier un document fictif</p>
+          <p className="mt-1 text-sm font-medium text-muted">
             JPG, PNG ou WebP · lecture effectuée sur cet appareil
           </p>
         </button>
       ) : (
-        <div className="mb-5 overflow-hidden rounded-3xl border border-[#b8ccc3] bg-white">
+        <div className="mb-5 overflow-hidden rounded-3xl border border-line-strong bg-white">
           {scanPreview && (
-            <div className="overflow-hidden bg-[#dce7e2]">
+            <div className="overflow-hidden bg-line">
               <img
                 src={scanPreview}
                 alt="Ordonnance à analyser"
@@ -1483,12 +1512,12 @@ function PrescriptionView({
           )}
           <div className="p-4">
             <div className="flex items-center justify-between gap-3">
-              <p className="min-w-0 truncate text-sm font-black">
+              <p className="min-w-0 truncate text-sm font-bold">
                 {scanFile.name}
               </p>
               <button
                 onClick={clearScan}
-                className="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-[#a84747] hover:bg-[#fff0eb]"
+                className="shrink-0 rounded-xl px-3 py-2 text-sm font-bold text-danger hover:bg-danger-bg"
               >
                 Retirer
               </button>
@@ -1496,7 +1525,7 @@ function PrescriptionView({
             <button
               onClick={runLocalOcr}
               disabled={scanProgress !== null}
-              className="mt-3 w-full rounded-xl bg-[#176b50] px-4 py-3 font-black text-white disabled:opacity-70"
+              className="mt-3 w-full rounded-xl bg-brand px-4 py-3 font-bold text-white disabled:opacity-70"
             >
               {scanProgress === null
                 ? scanText
@@ -1508,23 +1537,23 @@ function PrescriptionView({
         </div>
       )}
       {scanError && (
-        <div className="mb-5 rounded-2xl border border-[#d9b6b6] bg-[#fff7f5] p-4 text-sm font-bold text-[#a84747]">
+        <div className="mb-5 rounded-2xl border border-danger-soft bg-danger-bg p-4 text-sm font-bold text-danger">
           {scanError}
         </div>
       )}
       {scanSuggestions.length > 0 && (
-        <div className="mb-5 rounded-3xl border-2 border-[#90c8ae] bg-white p-5">
-          <h2 className="text-xl font-black">Médicaments détectés</h2>
-          <p className="mt-1 text-sm font-medium text-[#60766e]">
+        <div className="mb-5 rounded-3xl border-2 border-faint bg-white p-5">
+          <h2 className="text-xl font-bold">Médicaments détectés</h2>
+          <p className="mt-1 text-sm font-medium text-muted">
             Vérifiez chaque carte avec la photo.
           </p>
           <div className="mt-4 space-y-4">
             {scanSuggestions.map((suggestion, index) => (
               <article
                 key={suggestion.id}
-                className={`rounded-2xl border-2 p-4 ${suggestion.verified ? "border-[#90c8ae] bg-[#e2f5ea]" : "border-[#dce7e2] bg-[#f8faf9]"}`}
+                className={`rounded-2xl border-2 p-4 ${suggestion.verified ? "border-faint bg-brand-soft" : "border-line bg-surface-3"}`}
               >
-                <p className="mb-3 font-black">Médicament {index + 1}</p>
+                <p className="mb-3 font-bold">Médicament {index + 1}</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
                     ["Médicament", "name"],
@@ -1532,7 +1561,7 @@ function PrescriptionView({
                     ["Fréquence", "frequency"],
                     ["Durée", "duration"],
                   ].map(([label, field]) => (
-                    <label key={field} className="text-sm font-black">
+                    <label key={field} className="text-sm font-bold">
                       {label}
                       <input
                         value={String(
@@ -1551,11 +1580,11 @@ function PrescriptionView({
                             ),
                           )
                         }
-                        className="mt-2 w-full rounded-xl border border-[#ccdcd5] bg-white px-3 py-3"
+                        className="mt-2 w-full rounded-xl border border-line-strong bg-white px-3 py-3"
                       />
                     </label>
                   ))}
-                  <label className="text-sm font-black">
+                  <label className="text-sm font-bold">
                     Quantité par prise
                     <select
                       value={suggestion.quantity}
@@ -1568,14 +1597,14 @@ function PrescriptionView({
                           ),
                         )
                       }
-                      className="mt-2 w-full rounded-xl border border-[#ccdcd5] bg-white px-3 py-3"
+                      className="mt-2 w-full rounded-xl border border-line-strong bg-white px-3 py-3"
                     >
                       {QUANTITY_OPTIONS.map((quantity) => (
                         <option key={quantity} value={quantity}>{quantityLabel(quantity)}</option>
                       ))}
                     </select>
                   </label>
-                  <label className="text-sm font-black">
+                  <label className="text-sm font-bold">
                     Forme
                     <select
                       value={suggestion.form}
@@ -1588,7 +1617,7 @@ function PrescriptionView({
                           ),
                         )
                       }
-                      className="mt-2 w-full rounded-xl border border-[#ccdcd5] bg-white px-3 py-3"
+                      className="mt-2 w-full rounded-xl border border-line-strong bg-white px-3 py-3"
                     >
                       <option value="comprimé">Comprimé</option>
                       <option value="gélule">Gélule</option>
@@ -1599,11 +1628,11 @@ function PrescriptionView({
                   </label>
                 </div>
                 {suggestion.asNeeded ? (
-                  <div className="mt-3 rounded-xl bg-[#fff5dd] p-3 text-sm font-black text-[#765b2b]">
+                  <div className="mt-3 rounded-xl bg-warn-bg p-3 text-sm font-bold text-warn-ink">
                     Si besoin : aucun rappel automatique ne sera créé.
                   </div>
                 ) : (
-                  <label className="mt-3 block text-sm font-black">
+                  <label className="mt-3 block text-sm font-bold">
                     Horaires proposés
                     <input
                       value={suggestion.times.join(", ")}
@@ -1624,7 +1653,7 @@ function PrescriptionView({
                         )
                       }
                       placeholder="08:00, 13:00, 20:00"
-                      className="mt-2 w-full rounded-xl border border-[#ccdcd5] bg-white px-3 py-3"
+                      className="mt-2 w-full rounded-xl border border-line-strong bg-white px-3 py-3"
                     />
                   </label>
                 )}
@@ -1639,7 +1668,7 @@ function PrescriptionView({
                       ),
                     )
                   }
-                  className={`mt-3 w-full rounded-xl px-4 py-3 font-black ${suggestion.verified ? "bg-white text-[#176b50]" : "bg-[#176b50] text-white"}`}
+                  className={`mt-3 w-full rounded-xl px-4 py-3 font-bold ${suggestion.verified ? "bg-white text-brand" : "bg-brand text-white"}`}
                 >
                   {suggestion.verified ? "Correct ✓" : "C’est correct"}
                 </button>
@@ -1653,58 +1682,58 @@ function PrescriptionView({
                 setScanCrop({ x: 0, y: 0, width: 100, height: 100 });
                 resetScanResult();
               }}
-              className="rounded-xl border-2 border-[#d5e2dc] px-4 py-3 font-black text-[#37554b]"
+              className="rounded-xl border-2 border-line px-4 py-3 font-bold text-ink-2"
             >
               Refaire
             </button>
             <button
               type="button"
               onClick={addScanSuggestions}
-              className="rounded-xl bg-[#176b50] px-4 py-3 font-black text-white"
+              className="rounded-xl bg-brand px-4 py-3 font-bold text-white"
             >
               Confirmer l’ordonnance
             </button>
           </div>
         </div>
       )}
-      <div className="rounded-3xl border border-[#dce7e2] bg-white p-5">
+      <div className="rounded-3xl border border-line bg-white p-5">
         <div className="grid gap-4 sm:grid-cols-3">
-          <label className="text-sm font-black">
+          <label className="text-sm font-bold">
             Date de l’ordonnance
             <input
               value={issuedAt}
               onChange={(e) => setIssuedAt(e.target.value)}
               type="date"
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
             />
           </label>
-          <label className="text-sm font-black">
+          <label className="text-sm font-bold">
             Fin du traitement
             <input
               value={validUntil}
               onChange={(e) => setValidUntil(e.target.value)}
               type="date"
               min={issuedAt}
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
             />
           </label>
-          <label className="text-sm font-black">
+          <label className="text-sm font-bold">
             Prescripteur fictif
             <input
               value={prescriber}
               onChange={(e) => setPrescriber(e.target.value)}
               maxLength={80}
-              className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+              className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
             />
           </label>
         </div>
-        <label className="mt-4 block text-sm font-black">
+        <label className="mt-4 block text-sm font-bold">
           Note générale
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             maxLength={500}
-            className="mt-2 min-h-20 w-full rounded-xl border border-[#ccdcd5] p-3"
+            className="mt-2 min-h-20 w-full rounded-xl border border-line-strong p-3"
           />
         </label>
       </div>
@@ -1712,12 +1741,12 @@ function PrescriptionView({
         {items.map((item, index) => (
           <article
             key={item.id}
-            className="rounded-3xl border border-[#dce7e2] bg-white p-5"
+            className="rounded-3xl border border-line bg-white p-5"
           >
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <p className="font-black">Ligne {index + 1}</p>
-                <span className="rounded-full bg-[#edf5f1] px-2.5 py-1 text-[11px] font-black text-[#176b50]">
+                <p className="font-bold">Ligne {index + 1}</p>
+                <span className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-bold text-brand">
                   Saisie manuelle
                 </span>
               </div>
@@ -1730,7 +1759,7 @@ function PrescriptionView({
                       ...current.slice(index + 1),
                     ])
                   }
-                  className="rounded-full px-3 py-1 text-sm font-bold text-[#176b50] hover:bg-[#edf5f1]"
+                  className="rounded-full px-3 py-1 text-sm font-bold text-brand hover:bg-surface-2"
                 >
                   Dupliquer
                 </button>
@@ -1741,7 +1770,7 @@ function PrescriptionView({
                         current.filter((line) => line.id !== item.id),
                       )
                     }
-                    className="rounded-full px-3 py-1 text-sm font-bold text-[#a84747] hover:bg-[#fff0eb]"
+                    className="rounded-full px-3 py-1 text-sm font-bold text-danger hover:bg-danger-bg"
                   >
                     Retirer
                   </button>
@@ -1749,7 +1778,7 @@ function PrescriptionView({
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Nom fictif
                 <input
                   value={item.name}
@@ -1757,10 +1786,10 @@ function PrescriptionView({
                     updateItem(item.id, { name: e.target.value })
                   }
                   maxLength={80}
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Dosage
                 <input
                   value={item.dosage}
@@ -1768,17 +1797,17 @@ function PrescriptionView({
                     updateItem(item.id, { dosage: e.target.value })
                   }
                   maxLength={80}
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Forme
                 <select
                   value={item.form}
                   onChange={(e) =>
                     updateItem(item.id, { form: e.target.value })
                   }
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 >
                   <option value="comprimé">Comprimé</option>
                   <option value="gélule">Gélule</option>
@@ -1787,14 +1816,14 @@ function PrescriptionView({
                   <option value="autre">Autre</option>
                 </select>
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Quantité par prise
                 <select
                   value={item.quantity}
                   onChange={(e) =>
                     updateItem(item.id, { quantity: Number(e.target.value) })
                   }
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 >
                   {!QUANTITY_OPTIONS.includes(item.quantity) && (
                     <option value={item.quantity}>{quantityLabel(item.quantity)}</option>
@@ -1804,7 +1833,7 @@ function PrescriptionView({
                   ))}
                 </select>
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Horaires proposés
                 <input
                   value={item.times.join(", ")}
@@ -1819,10 +1848,10 @@ function PrescriptionView({
                     });
                   }}
                   placeholder="08:00, 13:00, 20:00"
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Stock initial
                 <input
                   value={item.stock}
@@ -1835,10 +1864,10 @@ function PrescriptionView({
                   min="0"
                   step="0.25"
                   max="999"
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Par rapport au repas
                 <select
                   value={item.mealTiming}
@@ -1848,7 +1877,7 @@ function PrescriptionView({
                         .value as PrescriptionItem["mealTiming"],
                     })
                   }
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 >
                   <option value="none">Non précisé</option>
                   <option value="before">Avant le repas</option>
@@ -1856,7 +1885,7 @@ function PrescriptionView({
                   <option value="after">Après le repas</option>
                 </select>
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Début
                 <input
                   value={item.startDate}
@@ -1864,10 +1893,10 @@ function PrescriptionView({
                     updateItem(item.id, { startDate: e.target.value })
                   }
                   type="date"
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
-              <label className="text-sm font-black">
+              <label className="text-sm font-bold">
                 Fin
                 <input
                   value={item.endDate}
@@ -1876,13 +1905,13 @@ function PrescriptionView({
                   }
                   type="date"
                   min={item.startDate}
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 />
               </label>
             </div>
             <fieldset className="mt-4">
               <div className="flex items-center justify-between gap-3">
-                <legend className="text-sm font-black">Jours de prise</legend>
+                <legend className="text-sm font-bold">Jours de prise</legend>
                 <select
                   aria-label="Rythme des jours de prise"
                   value={item.days.length === 7 ? "all" : item.days.join(",") === "1,2,3,4,5" ? "week" : "custom"}
@@ -1890,7 +1919,7 @@ function PrescriptionView({
                     if (event.target.value === "all") updateItem(item.id, { days: ALL_DAYS });
                     if (event.target.value === "week") updateItem(item.id, { days: [1, 2, 3, 4, 5] });
                   }}
-                  className="rounded-xl border border-[#ccdcd5] bg-white px-3 py-2 text-sm font-black text-[#176b50]"
+                  className="rounded-xl border border-line-strong bg-white px-3 py-2 text-sm font-bold text-brand"
                 >
                   <option value="all">Tous les jours</option>
                   <option value="week">Du lundi au vendredi</option>
@@ -1902,7 +1931,7 @@ function PrescriptionView({
                   (label, dayIndex) => (
                     <label
                       key={label}
-                      className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-black ${item.days.includes(dayIndex) ? "border-[#90c8ae] bg-[#e2f5ea] text-[#176b50]" : "border-[#d5e2dc] bg-white text-[#60766e]"}`}
+                      className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-bold ${item.days.includes(dayIndex) ? "border-faint bg-brand-soft text-brand" : "border-line bg-white text-muted"}`}
                     >
                       <input
                         type="checkbox"
@@ -1922,7 +1951,7 @@ function PrescriptionView({
                 )}
               </div>
             </fieldset>
-            <label className="mt-4 flex items-center gap-3 rounded-xl bg-[#f3f7f4] p-4 text-sm font-black">
+            <label className="mt-4 flex items-center gap-3 rounded-xl bg-surface-3 p-4 text-sm font-bold">
               <input
                 type="checkbox"
                 checked={item.asNeeded}
@@ -1934,7 +1963,7 @@ function PrescriptionView({
               Traitement « si besoin » — aucun rappel automatique
             </label>
             <label
-              className={`mt-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 text-sm font-black ${item.reviewed ? "border-[#90c8ae] bg-[#e2f5ea] text-[#176b50]" : "border-[#d5e2dc] bg-white text-[#37554b]"}`}
+              className={`mt-4 flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 text-sm font-bold ${item.reviewed ? "border-faint bg-brand-soft text-brand" : "border-line bg-white text-ink-2"}`}
             >
               <input
                 checked={item.reviewed}
@@ -1982,20 +2011,20 @@ function PrescriptionView({
             },
           ])
         }
-        className="mt-4 w-full rounded-2xl border-2 border-dashed border-[#b8ccc3] px-5 py-4 font-black text-[#176b50]"
+        className="mt-4 w-full rounded-2xl border-2 border-dashed border-line-strong px-5 py-4 font-bold text-brand"
       >
         + Ajouter une ligne
       </button>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         <button
           onClick={saveDraft}
-          className="rounded-2xl border-2 border-[#d5e2dc] bg-white px-5 py-4 font-black text-[#37554b]"
+          className="rounded-2xl border-2 border-line bg-white px-5 py-4 font-bold text-ink-2"
         >
           Enregistrer le brouillon
         </button>
         <button
           onClick={prepareValidation}
-          className="rounded-2xl bg-[#176b50] px-5 py-4 font-black text-white"
+          className="rounded-2xl bg-brand px-5 py-4 font-bold text-white"
         >
           Prévisualiser le nouveau calendrier
         </button>
@@ -2005,22 +2034,22 @@ function PrescriptionView({
           role="dialog"
           aria-modal="true"
           aria-labelledby="calendar-review-title"
-          className="fixed inset-0 z-50 grid place-items-end bg-[#17362d]/55 p-3 sm:place-items-center"
+          className="fixed inset-0 z-50 grid place-items-end bg-ink/55 p-3 sm:place-items-center"
         >
-          <section className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-[2rem] bg-[#f3f7f4] p-5 shadow-2xl sm:p-7">
-            <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+          <section className="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-[2rem] bg-surface-3 p-5 shadow-2xl sm:p-7">
+            <p className="text-sm font-bold uppercase tracking-wide text-brand">
               Dernière vérification
             </p>
-            <h2 id="calendar-review-title" className="mt-1 text-2xl font-black">
+            <h2 id="calendar-review-title" className="mt-1 text-2xl font-extrabold">
               Remplacer le programme actuel ?
             </h2>
-            <p className="mt-2 text-sm font-medium text-[#657a72]">
+            <p className="mt-2 text-sm font-medium text-muted">
               Comparez les horaires avant d’appliquer l’ordonnance. L’ancien
               programme sera conservé dans l’historique des versions.
             </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-[#dce7e2] bg-white p-4">
-                <p className="text-xs font-black uppercase text-[#71847d]">
+              <div className="rounded-2xl border border-line bg-white p-4">
+                <p className="text-xs font-bold uppercase text-muted-2">
                   Programme actuel · {currentDoses.length} prise
                   {currentDoses.length > 1 ? "s" : ""}
                 </p>
@@ -2028,15 +2057,15 @@ function PrescriptionView({
                   {currentDoses.map((dose) => (
                     <p
                       key={dose.id}
-                      className="rounded-xl bg-[#f3f7f4] px-3 py-2 text-sm font-bold"
+                      className="rounded-xl bg-surface-3 px-3 py-2 text-sm font-bold"
                     >
                       {dose.time} · {dose.label}
                     </p>
                   ))}
                 </div>
               </div>
-              <div className="rounded-2xl border-2 border-[#90c8ae] bg-white p-4">
-                <p className="text-xs font-black uppercase text-[#176b50]">
+              <div className="rounded-2xl border-2 border-faint bg-white p-4">
+                <p className="text-xs font-bold uppercase text-brand">
                   Nouveau programme · {proposedDoses.length} prise
                   {proposedDoses.length > 1 ? "s" : ""}
                 </p>
@@ -2044,12 +2073,12 @@ function PrescriptionView({
                   {proposedDoses.map((dose) => (
                     <div
                       key={dose.id}
-                      className="rounded-xl bg-[#e2f5ea] px-3 py-2"
+                      className="rounded-xl bg-brand-soft px-3 py-2"
                     >
-                      <p className="text-sm font-black">
+                      <p className="text-sm font-bold">
                         {dose.time} · {dose.label}
                       </p>
-                      <p className="mt-0.5 text-xs font-medium text-[#527066]">
+                      <p className="mt-0.5 text-xs font-medium text-muted-2">
                         {dose.detail}
                       </p>
                     </div>
@@ -2057,20 +2086,20 @@ function PrescriptionView({
                 </div>
               </div>
             </div>
-            <div className="mt-5 rounded-2xl border border-[#efc16d] bg-[#fff5dd] p-4 text-sm font-medium text-[#765b2b]">
+            <div className="mt-5 rounded-2xl border border-warn-border bg-warn-bg p-4 text-sm font-medium text-warn-ink">
               Cette validation organise les rappels. Elle ne remplace jamais la
               vérification d’un professionnel de santé.
             </div>
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <button
                 onClick={() => setProposedDoses(null)}
-                className="rounded-2xl border-2 border-[#d5e2dc] bg-white px-5 py-4 font-black text-[#37554b]"
+                className="rounded-2xl border-2 border-line bg-white px-5 py-4 font-bold text-ink-2"
               >
                 Revenir corriger
               </button>
               <button
                 onClick={applyValidation}
-                className="rounded-2xl bg-[#176b50] px-5 py-4 font-black text-white"
+                className="rounded-2xl bg-brand px-5 py-4 font-bold text-white"
               >
                 Confirmer le remplacement
               </button>
@@ -2079,7 +2108,7 @@ function PrescriptionView({
         </div>
       )}
       {prescription && (
-        <p className="mt-4 text-center text-sm font-bold text-[#6b8078]">
+        <p className="mt-4 text-center text-sm font-bold text-muted">
           Statut :{" "}
           {prescription.status === "validated" ? "Validée" : "Brouillon"} · mise
           à jour {new Date(prescription.updatedAt).toLocaleString("fr-FR")}
@@ -2109,33 +2138,33 @@ function PrescriptionVersions({
       {current?.status === "validated" &&
         daysLeft !== null &&
         daysLeft <= 7 && (
-          <div className="mb-4 rounded-2xl border border-[#efc16d] bg-[#fff5dd] p-4">
-            <p className="font-black text-[#865e19]">
+          <div className="mb-4 rounded-2xl border border-warn-border bg-warn-bg p-4">
+            <p className="font-bold text-warn-ink">
               Renouvellement à vérifier
             </p>
-            <p className="mt-1 text-sm font-medium text-[#765b2b]">
+            <p className="mt-1 text-sm font-medium text-warn-ink">
               Échéance estimée dans {Math.max(0, daysLeft)} jour
               {daysLeft > 1 ? "s" : ""}. Confirmez toujours cette date avec la
               pharmacie.
             </p>
           </div>
         )}
-      <div className="rounded-3xl border border-[#dce7e2] bg-white p-5">
-        <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+      <div className="rounded-3xl border border-line bg-white p-5">
+        <p className="text-sm font-bold uppercase tracking-wide text-brand">
           Versions de l’ordonnance
         </p>
         <div className="mt-3 space-y-2">
           {current && (
-            <div className="flex items-center justify-between rounded-xl bg-[#edf5f1] p-3">
+            <div className="flex items-center justify-between rounded-xl bg-surface-2 p-3">
               <div>
-                <p className="font-black">Version actuelle</p>
-                <p className="text-xs font-medium text-[#6d817a]">
+                <p className="font-bold">Version actuelle</p>
+                <p className="text-xs font-medium text-muted-2">
                   Du {new Date(current.issuedAt).toLocaleDateString("fr-FR")} ·{" "}
                   {current.items.length} ligne
                   {current.items.length > 1 ? "s" : ""}
                 </p>
               </div>
-              <span className="text-xs font-black text-[#176b50]">
+              <span className="text-xs font-bold text-brand">
                 {current.status === "validated" ? "VALIDÉE" : "BROUILLON"}
               </span>
             </div>
@@ -2143,13 +2172,13 @@ function PrescriptionVersions({
           {versions.map((version, index) => (
             <div
               key={`${version.id}-${version.updatedAt}`}
-              className="flex items-center justify-between rounded-xl border border-[#e6eeea] p-3"
+              className="flex items-center justify-between rounded-xl border border-surface-2 p-3"
             >
               <div>
                 <p className="font-bold">
                   Version précédente {versions.length - index}
                 </p>
-                <p className="text-xs font-medium text-[#6d817a]">
+                <p className="text-xs font-medium text-muted-2">
                   Du {new Date(version.issuedAt).toLocaleDateString("fr-FR")} ·
                   archivée{" "}
                   {new Date(version.updatedAt).toLocaleDateString("fr-FR")}
@@ -2157,7 +2186,7 @@ function PrescriptionVersions({
               </div>
               <button
                 onClick={() => onRestore(version)}
-                className="rounded-xl bg-[#edf5f1] px-3 py-2 text-xs font-black text-[#176b50]"
+                className="rounded-xl bg-surface-2 px-3 py-2 text-xs font-bold text-brand"
               >
                 Restaurer
               </button>
@@ -2275,14 +2304,14 @@ function PilotView({
   if (!pilot.startedAt)
     return (
       <section className="mx-auto max-w-lg px-5 pb-32">
-        <div className="rounded-[2rem] bg-[#17362d] p-7 text-white">
-          <p className="text-sm font-black uppercase tracking-wide text-[#b9d6ca]">
+        <div className="rounded-[2rem] bg-ink p-7 text-white">
+          <p className="text-sm font-bold uppercase tracking-wide text-line-strong">
             Phase 1
           </p>
-          <h1 className="mt-2 text-3xl font-black">
+          <h1 className="mt-2 text-3xl font-extrabold">
             Pilote familial de 14 jours
           </h1>
-          <p className="mt-3 leading-relaxed text-[#d5e4de]">
+          <p className="mt-3 leading-relaxed text-line">
             Mesurez l’autonomie du patient, la fiabilité des alertes et
             l’utilité réelle pour l’aidant.
           </p>
@@ -2294,14 +2323,14 @@ function PilotView({
                 issues: [],
               })
             }
-            className="mt-6 w-full rounded-2xl bg-[#d8f36a] px-5 py-4 text-lg font-black text-[#17362d]"
+            className="mt-6 w-full rounded-2xl bg-accent px-5 py-4 text-lg font-bold text-ink"
           >
             Démarrer le pilote
           </button>
         </div>
-        <div className="mt-5 rounded-3xl border border-[#dce7e2] bg-white p-5">
-          <p className="font-black">Avant de commencer</p>
-          <ul className="mt-3 space-y-2 text-sm font-medium text-[#62776f]">
+        <div className="mt-5 rounded-3xl border border-line bg-white p-5">
+          <p className="font-bold">Avant de commencer</p>
+          <ul className="mt-3 space-y-2 text-sm font-medium text-muted">
             <li>✓ Utiliser des données fictives</li>
             <li>✓ Tester sur deux téléphones</li>
             <li>✓ Ne pas modifier une prescription</li>
@@ -2312,54 +2341,54 @@ function PilotView({
     );
   return (
     <section className="mx-auto max-w-3xl px-5 pb-32">
-      <div className="mb-5 flex items-end justify-between rounded-3xl bg-[#17362d] p-6 text-white">
+      <div className="mb-5 flex items-end justify-between rounded-3xl bg-ink p-6 text-white">
         <div>
-          <p className="text-sm font-bold text-[#b9d6ca]">PILOTE EN COURS</p>
-          <h1 className="mt-1 text-3xl font-black">Jour {day} sur 14</h1>
+          <p className="text-sm font-bold text-line-strong">PILOTE EN COURS</p>
+          <h1 className="mt-1 text-3xl font-extrabold">Jour {day} sur 14</h1>
         </div>
         <div className="text-right">
-          <p className="text-3xl font-black text-[#d8f36a]">
+          <p className="text-3xl font-extrabold text-accent">
             {Math.round((day / 14) * 100)}%
           </p>
-          <p className="text-xs font-bold text-[#b9d6ca]">du test</p>
+          <p className="text-xs font-bold text-line-strong">du test</p>
         </div>
       </div>
       <div className="mb-6 grid grid-cols-3 gap-3">
         <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-black">{adherence}%</p>
-          <p className="text-xs font-bold text-[#6d817a]">confirmations</p>
+          <p className="text-2xl font-extrabold">{adherence}%</p>
+          <p className="text-xs font-bold text-muted-2">confirmations</p>
         </div>
         <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-black">{averageEase}</p>
-          <p className="text-xs font-bold text-[#6d817a]">facilité / 5</p>
+          <p className="text-2xl font-extrabold">{averageEase}</p>
+          <p className="text-xs font-bold text-muted-2">facilité / 5</p>
         </div>
         <div className="rounded-2xl bg-white p-4 text-center shadow-sm">
-          <p className="text-2xl font-black">{pilot.issues.length}</p>
-          <p className="text-xs font-bold text-[#6d817a]">difficultés</p>
+          <p className="text-2xl font-extrabold">{pilot.issues.length}</p>
+          <p className="text-xs font-bold text-muted-2">difficultés</p>
         </div>
       </div>
       <div className="grid gap-5 md:grid-cols-2">
-        <div className="rounded-3xl border border-[#dce7e2] bg-white p-5">
-          <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+        <div className="rounded-3xl border border-line bg-white p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-brand">
             Questionnaire J{milestone} ·{" "}
             {role === "patient" ? "Patient" : "Aidant"}
           </p>
           {submitted ? (
             <div className="py-8 text-center">
               <div className="text-3xl">✓</div>
-              <p className="mt-2 font-black">Réponses enregistrées</p>
-              <p className="mt-1 text-sm font-medium text-[#71847d]">
+              <p className="mt-2 font-bold">Réponses enregistrées</p>
+              <p className="mt-1 text-sm font-medium text-muted-2">
                 Prochaine étape : J{milestone === 1 ? 7 : 14}.
               </p>
             </div>
           ) : (
             <div className="mt-4 space-y-4">
-              <label className="block text-sm font-black">
+              <label className="block text-sm font-bold">
                 Facilité d’utilisation
                 <select
                   value={ease}
                   onChange={(e) => setEase(Number(e.target.value))}
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 >
                   <option value={1}>1 — Très difficile</option>
                   <option value={2}>2</option>
@@ -2368,12 +2397,12 @@ function PilotView({
                   <option value={5}>5 — Très simple</option>
                 </select>
               </label>
-              <label className="block text-sm font-black">
+              <label className="block text-sm font-bold">
                 Confiance dans les informations
                 <select
                   value={confidence}
                   onChange={(e) => setConfidence(Number(e.target.value))}
-                  className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"
+                  className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"
                 >
                   <option value={1}>1 — Aucune</option>
                   <option value={2}>2</option>
@@ -2382,7 +2411,7 @@ function PilotView({
                   <option value={5}>5 — Totale</option>
                 </select>
               </label>
-              <label className="flex items-center gap-3 text-sm font-black">
+              <label className="flex items-center gap-3 text-sm font-bold">
                 <input
                   checked={continueUse}
                   onChange={(e) => setContinueUse(e.target.checked)}
@@ -2396,19 +2425,19 @@ function PilotView({
                 onChange={(e) => setNote(e.target.value)}
                 maxLength={500}
                 placeholder="Votre remarque principale…"
-                className="min-h-24 w-full rounded-xl border border-[#ccdcd5] p-3"
+                className="min-h-24 w-full rounded-xl border border-line-strong p-3"
               />
               <button
                 onClick={submitFeedback}
-                className="w-full rounded-xl bg-[#176b50] px-4 py-3 font-black text-white"
+                className="w-full rounded-xl bg-brand px-4 py-3 font-bold text-white"
               >
                 Enregistrer mes réponses
               </button>
             </div>
           )}
         </div>
-        <div className="rounded-3xl border border-[#dce7e2] bg-white p-5">
-          <p className="text-sm font-black uppercase tracking-wide text-[#a84747]">
+        <div className="rounded-3xl border border-line bg-white p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-danger">
             Journal des difficultés
           </p>
           <textarea
@@ -2416,11 +2445,11 @@ function PilotView({
             onChange={(e) => setIssue(e.target.value)}
             maxLength={500}
             placeholder="Décrivez un oubli, une fausse alerte ou une confusion…"
-            className="mt-4 min-h-28 w-full rounded-xl border border-[#ccdcd5] p-3"
+            className="mt-4 min-h-28 w-full rounded-xl border border-line-strong p-3"
           />
           <button
             onClick={submitIssue}
-            className="mt-3 w-full rounded-xl border-2 border-[#d5e2dc] px-4 py-3 font-black text-[#37554b]"
+            className="mt-3 w-full rounded-xl border-2 border-line px-4 py-3 font-bold text-ink-2"
           >
             Ajouter au journal
           </button>
@@ -2428,60 +2457,60 @@ function PilotView({
             {pilot.issues.map((item) => (
               <div
                 key={item.id}
-                className="rounded-xl bg-[#fff7f5] p-3 text-sm"
+                className="rounded-xl bg-danger-bg p-3 text-sm"
               >
                 <p className="font-bold">
                   {item.role === "patient" ? "Patient" : "Aidant"} ·{" "}
                   {new Date(item.createdAt).toLocaleDateString("fr-FR")}
                 </p>
-                <p className="mt-1 text-[#6f5d58]">{item.note}</p>
+                <p className="mt-1 text-muted-2">{item.note}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
       {day >= 14 && (
-        <div className="mt-5 rounded-3xl border-2 border-[#90c8ae] bg-[#e2f5ea] p-6">
-          <p className="text-sm font-black uppercase tracking-wide text-[#176b50]">
+        <div className="mt-5 rounded-3xl border-2 border-faint bg-brand-soft p-6">
+          <p className="text-sm font-bold uppercase tracking-wide text-brand">
             Bilan final · Phase 1
           </p>
-          <h2 className="mt-1 text-2xl font-black">
+          <h2 className="mt-1 text-2xl font-extrabold">
             Résultats du pilote familial
           </h2>
           <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className="rounded-2xl bg-white p-3 text-center">
-              <p className="text-xl font-black">{adherence}%</p>
-              <p className="text-xs font-bold text-[#6d817a]">
+              <p className="text-xl font-bold">{adherence}%</p>
+              <p className="text-xs font-bold text-muted-2">
                 prises confirmées
               </p>
             </div>
             <div className="rounded-2xl bg-white p-3 text-center">
-              <p className="text-xl font-black">{averageConfidence}/5</p>
-              <p className="text-xs font-bold text-[#6d817a]">confiance</p>
+              <p className="text-xl font-bold">{averageConfidence}/5</p>
+              <p className="text-xs font-bold text-muted-2">confiance</p>
             </div>
             <div className="rounded-2xl bg-white p-3 text-center">
-              <p className="text-xl font-black">{missedCount + refusedCount}</p>
-              <p className="text-xs font-bold text-[#6d817a]">
+              <p className="text-xl font-bold">{missedCount + refusedCount}</p>
+              <p className="text-xs font-bold text-muted-2">
                 écarts déclarés
               </p>
             </div>
             <div className="rounded-2xl bg-white p-3 text-center">
-              <p className="text-xl font-black">
+              <p className="text-xl font-bold">
                 {wantsToContinue}/{pilot.feedback.length}
               </p>
-              <p className="text-xs font-bold text-[#6d817a]">
+              <p className="text-xs font-bold text-muted-2">
                 veulent continuer
               </p>
             </div>
           </div>
-          <p className="mt-4 font-bold text-[#386553]">
+          <p className="mt-4 font-bold text-brand">
             {adherence >= 80 && pilot.issues.length <= 5
               ? "Signal favorable : le pilote atteint les principaux critères de poursuite."
               : "Des ajustements sont recommandés avant d’élargir le test à d’autres familles."}
           </p>
         </div>
       )}
-      <div className="mt-5 rounded-2xl bg-[#edf5f1] p-4 text-sm font-medium text-[#547066]">
+      <div className="mt-5 rounded-2xl bg-surface-2 p-4 text-sm font-medium text-muted-2">
         Critères visés : utilisation autonome, au moins 80 % des prises
         confirmées, peu de fausses alertes et volonté de continuer après 14
         jours.
@@ -2519,48 +2548,48 @@ function PatientProfileView({
   };
   return (
     <section className="mx-auto max-w-3xl px-5 pb-32">
-      <div className="mb-5 rounded-3xl bg-[#17362d] p-6 text-white">
-        <p className="text-sm font-black uppercase tracking-wide text-[#b9d6ca]">
+      <div className="mb-5 rounded-3xl bg-ink p-6 text-white">
+        <p className="text-sm font-bold uppercase tracking-wide text-line-strong">
           Espace Aidant
         </p>
-        <h1 className="mt-1 text-3xl font-black">Fiche patient</h1>
-        <p className="mt-2 max-w-xl font-medium text-[#d5e4de]">
+        <h1 className="mt-1 text-3xl font-extrabold">Fiche patient</h1>
+        <p className="mt-2 max-w-xl font-medium text-line">
           Ces informations personnalisent le suivi familial. Pour ce pilote public, utilisez uniquement des données fictives.
         </p>
       </div>
-      <div className="rounded-3xl border border-[#dce7e2] bg-white p-5">
-        <h2 className="text-xl font-black">Identité</h2>
-        <p className="mt-1 text-sm font-medium text-[#60766e]">Les champs marqués * sont nécessaires.</p>
+      <div className="rounded-3xl border border-line bg-white p-5">
+        <h2 className="text-xl font-bold">Identité</h2>
+        <p className="mt-1 text-sm font-medium text-muted">Les champs marqués * sont nécessaires.</p>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-black">Prénom *
-            <input value={form.firstName} onChange={(e) => update("firstName", e.target.value)} maxLength={50} autoComplete="off" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Prénom *
+            <input value={form.firstName} onChange={(e) => update("firstName", e.target.value)} maxLength={50} autoComplete="off" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
-          <label className="text-sm font-black">Nom *
-            <input value={form.lastName} onChange={(e) => update("lastName", e.target.value)} maxLength={60} autoComplete="off" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Nom *
+            <input value={form.lastName} onChange={(e) => update("lastName", e.target.value)} maxLength={60} autoComplete="off" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
-          <label className="text-sm font-black">Date de naissance *
-            <input value={form.birthDate} onChange={(e) => update("birthDate", e.target.value)} type="date" max={new Date().toISOString().slice(0, 10)} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Date de naissance *
+            <input value={form.birthDate} onChange={(e) => update("birthDate", e.target.value)} type="date" max={new Date().toISOString().slice(0, 10)} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
-          <label className="text-sm font-black">Téléphone
-            <input value={form.phone} onChange={(e) => update("phone", e.target.value)} type="tel" inputMode="tel" maxLength={30} placeholder="06 00 00 00 00" autoComplete="off" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Téléphone
+            <input value={form.phone} onChange={(e) => update("phone", e.target.value)} type="tel" inputMode="tel" maxLength={30} placeholder="06 00 00 00 00" autoComplete="off" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
         </div>
       </div>
-      <div className="mt-5 rounded-3xl border border-[#dce7e2] bg-white p-5">
-        <h2 className="text-xl font-black">Personne à prévenir</h2>
+      <div className="mt-5 rounded-3xl border border-line bg-white p-5">
+        <h2 className="text-xl font-bold">Personne à prévenir</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-black">Nom et lien avec le patient
-            <input value={form.emergencyName} onChange={(e) => update("emergencyName", e.target.value)} maxLength={80} placeholder="Ex. Camille, sa fille" autoComplete="off" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Nom et lien avec le patient
+            <input value={form.emergencyName} onChange={(e) => update("emergencyName", e.target.value)} maxLength={80} placeholder="Ex. Camille, sa fille" autoComplete="off" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
-          <label className="text-sm font-black">Téléphone
-            <input value={form.emergencyPhone} onChange={(e) => update("emergencyPhone", e.target.value)} type="tel" inputMode="tel" maxLength={30} placeholder="06 00 00 00 00" autoComplete="off" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" />
+          <label className="text-sm font-bold">Téléphone
+            <input value={form.emergencyPhone} onChange={(e) => update("emergencyPhone", e.target.value)} type="tel" inputMode="tel" maxLength={30} placeholder="06 00 00 00 00" autoComplete="off" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" />
           </label>
         </div>
-        <label className="mt-4 block text-sm font-black">Note utile au suivi
-          <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} maxLength={300} placeholder="Ex. préfère être appelée le matin" className="mt-2 min-h-24 w-full rounded-xl border border-[#ccdcd5] p-3" />
+        <label className="mt-4 block text-sm font-bold">Note utile au suivi
+          <textarea value={form.notes} onChange={(e) => update("notes", e.target.value)} maxLength={300} placeholder="Ex. préfère être appelée le matin" className="mt-2 min-h-24 w-full rounded-xl border border-line-strong p-3" />
         </label>
       </div>
-      <button onClick={saveProfile} className="mt-5 w-full rounded-2xl bg-[#176b50] px-5 py-4 text-lg font-black text-white">
+      <button onClick={saveProfile} className="mt-5 w-full rounded-2xl bg-brand px-5 py-4 text-lg font-bold text-white">
         Enregistrer la fiche patient
       </button>
     </section>
@@ -2573,14 +2602,14 @@ function MyMedicationsView({ prescription }: { prescription: Prescription }) {
   return (
     <section className="mx-auto max-w-lg px-5 pb-40">
       <div className="mb-5">
-        <p className="text-sm font-black uppercase tracking-[.14em] text-[#176b50]">Mon traitement</p>
-        <h1 className="mt-1 text-3xl font-black tracking-[-.035em]">Mes médicaments</h1>
-        <p className="mt-2 font-medium text-[#60766e]">Les informations validées par votre aidant à partir de l’ordonnance.</p>
+        <p className="text-sm font-bold uppercase tracking-[.14em] text-brand">Mon traitement</p>
+        <h1 className="mt-1 text-3xl font-extrabold tracking-[-.035em]">Mes médicaments</h1>
+        <p className="mt-2 font-medium text-muted">Les informations validées par votre aidant à partir de l’ordonnance.</p>
       </div>
       {items.length === 0 ? (
-        <div className="rounded-3xl border border-[#dce7e2] bg-white p-7 text-center">
-          <p className="text-xl font-black">Aucun médicament enregistré</p>
-          <p className="mt-2 text-sm font-medium text-[#60766e]">Votre aidant doit d’abord ajouter et vérifier l’ordonnance.</p>
+        <div className="rounded-3xl border border-line bg-white p-7 text-center">
+          <p className="text-xl font-bold">Aucun médicament enregistré</p>
+          <p className="mt-2 text-sm font-medium text-muted">Votre aidant doit d’abord ajouter et vérifier l’ordonnance.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -2589,23 +2618,23 @@ function MyMedicationsView({ prescription }: { prescription: Prescription }) {
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
                 <MedicationVisual form={item.form} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-xl font-black">{item.name}</span>
-                  <span className="mt-1 block font-bold text-[#176b50]">{item.dosage} · {quantityLabel(item.quantity)} {item.form}{item.quantity > 1 ? "s" : ""}</span>
+                  <span className="block truncate text-xl font-bold">{item.name}</span>
+                  <span className="mt-1 block font-bold text-brand">{item.dosage} · {quantityLabel(item.quantity)} {item.form}{item.quantity > 1 ? "s" : ""}</span>
                 </span>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#edf5f1] text-xl font-black text-[#176b50] group-open:rotate-45">+</span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-xl font-bold text-brand group-open:rotate-45">+</span>
               </summary>
-              <div className="mt-4 grid gap-3 border-t border-[#edf2ef] pt-4 text-sm sm:grid-cols-2">
-                <div className="rounded-2xl bg-[#f3f7f4] p-3"><p className="font-black">Horaires</p><p className="mt-1 font-medium text-[#60766e]">{item.asNeeded ? "Si besoin, sans rappel" : item.times.join(" · ")}</p></div>
-                <div className="rounded-2xl bg-[#f3f7f4] p-3"><p className="font-black">Fréquence</p><p className="mt-1 font-medium text-[#60766e]">{item.frequencyText || (item.asNeeded ? "Selon le besoin" : "Selon les horaires")}</p></div>
-                <div className="rounded-2xl bg-[#f3f7f4] p-3"><p className="font-black">Jours de prise</p><p className="mt-1 font-medium text-[#60766e]">{item.days.length === 7 ? "Tous les jours" : item.days.map((day) => dayNames[day]).join(" · ")}</p></div>
-                <div className="rounded-2xl bg-[#f3f7f4] p-3"><p className="font-black">Durée</p><p className="mt-1 font-medium text-[#60766e]">{item.durationText || `Du ${item.startDate} au ${item.endDate}`}</p></div>
+              <div className="mt-4 grid gap-3 border-t border-surface-2 pt-4 text-sm sm:grid-cols-2">
+                <div className="rounded-2xl bg-surface-3 p-3"><p className="font-bold">Horaires</p><p className="mt-1 font-medium text-muted">{item.asNeeded ? "Si besoin, sans rappel" : item.times.join(" · ")}</p></div>
+                <div className="rounded-2xl bg-surface-3 p-3"><p className="font-bold">Fréquence</p><p className="mt-1 font-medium text-muted">{item.frequencyText || (item.asNeeded ? "Selon le besoin" : "Selon les horaires")}</p></div>
+                <div className="rounded-2xl bg-surface-3 p-3"><p className="font-bold">Jours de prise</p><p className="mt-1 font-medium text-muted">{item.days.length === 7 ? "Tous les jours" : item.days.map((day) => dayNames[day]).join(" · ")}</p></div>
+                <div className="rounded-2xl bg-surface-3 p-3"><p className="font-bold">Durée</p><p className="mt-1 font-medium text-muted">{item.durationText || `Du ${item.startDate} au ${item.endDate}`}</p></div>
               </div>
-              {item.cis && <div className="mt-3 rounded-2xl border border-[#dce7e2] bg-[#f7faf8] p-4 text-sm"><p className="font-black text-[#176b50]">Fiche officielle vérifiée · CIS {item.cis}</p><p className="mt-1 font-medium text-[#60766e]">{item.activeSubstances || "Substance non renseignée"}{item.administrationRoute ? ` · voie ${item.administrationRoute}` : ""}</p><p className="mt-1 text-xs font-bold text-[#71847d]">{item.commercialStatus}</p><a href={officialNoticeUrl(item.cis)} target="_blank" rel="noreferrer" className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-[#176b50] px-4 text-center font-black text-white">Consulter la notice officielle ↗</a><p className="mt-2 text-xs font-medium text-[#71847d]">La notice s’ouvre sur le site public officiel des médicaments.</p></div>}
+              {item.cis && <div className="mt-3 rounded-2xl border border-line bg-surface-3 p-4 text-sm"><p className="font-bold text-brand">Fiche officielle vérifiée · CIS {item.cis}</p><p className="mt-1 font-medium text-muted">{item.activeSubstances || "Substance non renseignée"}{item.administrationRoute ? ` · voie ${item.administrationRoute}` : ""}</p><p className="mt-1 text-xs font-bold text-muted-2">{item.commercialStatus}</p><a href={officialNoticeUrl(item.cis)} target="_blank" rel="noreferrer" className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-brand px-4 text-center font-bold text-white">Consulter la notice officielle ↗</a><p className="mt-2 text-xs font-medium text-muted-2">La notice s’ouvre sur le site public officiel des médicaments.</p></div>}
             </details>
           ))}
         </div>
       )}
-      <p className="mt-5 rounded-2xl bg-[#fff5dd] p-4 text-sm font-medium text-[#765b2b]">En cas de doute, ne modifiez pas votre traitement vous-même et contactez votre aidant ou un professionnel de santé.</p>
+      <p className="mt-5 rounded-2xl bg-warn-bg p-4 text-sm font-medium text-warn-ink">En cas de doute, ne modifiez pas votre traitement vous-même et contactez votre aidant ou un professionnel de santé.</p>
     </section>
   );
 }
@@ -2684,69 +2713,69 @@ function TreatmentManager({
   return (
     <section className="mx-auto max-w-6xl px-5 pb-40">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div><p className="text-sm font-black uppercase tracking-[.14em] text-[#176b50]">Administration</p><h1 className="mt-1 text-3xl font-black tracking-[-.035em] sm:text-4xl">Traitements en cours</h1><p className="mt-2 font-medium text-[#60766e]">Modifiez les informations réellement affichées et planifiées côté Patient.</p></div>
-        <button onClick={openPrescription} className="rounded-2xl border border-[#d5e2dc] bg-white px-5 py-3.5 font-black text-[#176b50]">Scanner ou consulter l’ordonnance</button>
+        <div><p className="text-sm font-bold uppercase tracking-[.14em] text-brand">Administration</p><h1 className="mt-1 text-3xl font-extrabold tracking-[-.035em] sm:text-4xl">Traitements en cours</h1><p className="mt-2 font-medium text-muted">Modifiez les informations réellement affichées et planifiées côté Patient.</p></div>
+        <button onClick={openPrescription} className="rounded-2xl border border-line bg-white px-5 py-3.5 font-bold text-brand">Scanner ou consulter l’ordonnance</button>
       </div>
       {items.length === 0 ? (
-        <div className="rounded-3xl border border-[#dce7e2] bg-white p-8 text-center"><p className="text-xl font-black">Aucun traitement enregistré</p><button onClick={openPrescription} className="mt-4 rounded-xl bg-[#176b50] px-5 py-3 font-black text-white">Ajouter une ordonnance</button></div>
+        <div className="rounded-3xl border border-line bg-white p-8 text-center"><p className="text-xl font-bold">Aucun traitement enregistré</p><button onClick={openPrescription} className="mt-4 rounded-xl bg-brand px-5 py-3 font-bold text-white">Ajouter une ordonnance</button></div>
       ) : (
         <div className="space-y-4">
           {items.map((item, index) => (
-            <article id={`treatment-${item.id}`} key={item.id} className={`scroll-mt-24 rounded-3xl bg-white p-5 shadow-[0_12px_35px_rgba(35,72,60,.07)] ${newItemId === item.id ? "border-2 border-[#90c8ae]" : "border border-white"}`}>
-              {newItemId === item.id && <div className="mb-5 rounded-2xl bg-[#e2f5ea] p-4"><p className="text-xs font-black uppercase tracking-[.14em] text-[#176b50]">Étape 2 sur 2</p><p className="mt-1 text-lg font-black">Complétez la prise</p><p className="mt-1 text-sm font-medium text-[#527066]">La référence officielle est sélectionnée. Vérifiez maintenant le dosage, la quantité, les horaires, les dates et le stock.</p></div>}
-              <div className="mb-4 flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-wider text-[#71847d]">Médicament {index + 1}</p><p className="mt-1 text-xl font-black">{item.name || "Nouveau médicament"}</p></div><button onClick={() => { if (window.confirm(`Retirer ${item.name || "ce médicament"} du traitement en cours ?`)) setItems((current) => current.filter((line) => line.id !== item.id)); }} className="rounded-xl px-3 py-2 text-sm font-black text-[#a84747] hover:bg-[#fff0eb]">Retirer</button></div>
+            <article id={`treatment-${item.id}`} key={item.id} className={`scroll-mt-24 rounded-3xl bg-white p-5 shadow-[0_12px_35px_rgba(35,72,60,.07)] ${newItemId === item.id ? "border-2 border-faint" : "border border-white"}`}>
+              {newItemId === item.id && <div className="mb-5 rounded-2xl bg-brand-soft p-4"><p className="text-xs font-bold uppercase tracking-[.14em] text-brand">Étape 2 sur 2</p><p className="mt-1 text-lg font-bold">Complétez la prise</p><p className="mt-1 text-sm font-medium text-muted-2">La référence officielle est sélectionnée. Vérifiez maintenant le dosage, la quantité, les horaires, les dates et le stock.</p></div>}
+              <div className="mb-4 flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-muted-2">Médicament {index + 1}</p><p className="mt-1 text-xl font-bold">{item.name || "Nouveau médicament"}</p></div><button onClick={() => { if (window.confirm(`Retirer ${item.name || "ce médicament"} du traitement en cours ?`)) setItems((current) => current.filter((line) => line.id !== item.id)); }} className="rounded-xl px-3 py-2 text-sm font-bold text-danger hover:bg-danger-bg">Retirer</button></div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <label className="text-sm font-black">Nom<input value={item.name} onChange={(e) => update(item.id, { name: e.target.value })} maxLength={80} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Dosage<input value={item.dosage} onChange={(e) => update(item.id, { dosage: e.target.value })} maxLength={80} placeholder="Ex. 500 mg" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Quantité par prise<select value={item.quantity} onChange={(e) => update(item.id, { quantity: Number(e.target.value) })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3">{QUANTITY_OPTIONS.map((quantity) => <option key={quantity} value={quantity}>{quantityLabel(quantity)}</option>)}</select></label>
-                <label className="text-sm font-black">Forme<select value={item.form} onChange={(e) => update(item.id, { form: e.target.value })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"><option value="comprimé">Comprimé</option><option value="gélule">Gélule</option><option value="sachet">Sachet</option><option value="dose">Dose</option><option value="ml">ml</option><option value="autre">Autre</option></select></label>
-                <label className="text-sm font-black">Horaires<input value={item.times.join(", ")} disabled={item.asNeeded} onChange={(e) => { const times = e.target.value.split(",").map((time) => time.trim()).filter(Boolean); update(item.id, { times, time: times[0] || item.time }); }} placeholder="08:00, 20:00" className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3 disabled:bg-[#edf2ef]" /></label>
-                <label className="text-sm font-black">Unités par boîte<input value={item.unitsPerBox} type="number" min="1" max="500" onChange={(e) => update(item.id, { unitsPerBox: Math.max(1, Math.min(500, Number(e.target.value))) })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Alerte sous<input value={item.lowStockThreshold} type="number" min="0" max="500" onChange={(e) => update(item.id, { lowStockThreshold: Math.max(0, Math.min(500, Number(e.target.value))) })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Début<input value={item.startDate} type="date" onChange={(e) => update(item.id, { startDate: e.target.value })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Fin<input value={item.endDate} type="date" min={item.startDate} onChange={(e) => update(item.id, { endDate: e.target.value })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3" /></label>
-                <label className="text-sm font-black">Par rapport au repas<select value={item.mealTiming} onChange={(e) => update(item.id, { mealTiming: e.target.value as PrescriptionItem["mealTiming"] })} className="mt-2 w-full rounded-xl border border-[#ccdcd5] px-3 py-3"><option value="none">Non précisé</option><option value="before">Avant</option><option value="during">Pendant</option><option value="after">Après</option></select></label>
-                <label className="flex items-center gap-3 self-end rounded-xl bg-[#f3f7f4] p-3 text-sm font-black"><input type="checkbox" checked={item.asNeeded} onChange={(e) => update(item.id, { asNeeded: e.target.checked, times: e.target.checked ? [] : item.times.length ? item.times : ["08:00"] })} className="h-5 w-5" />Si besoin, sans rappel</label>
+                <label className="text-sm font-bold">Nom<input value={item.name} onChange={(e) => update(item.id, { name: e.target.value })} maxLength={80} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Dosage<input value={item.dosage} onChange={(e) => update(item.id, { dosage: e.target.value })} maxLength={80} placeholder="Ex. 500 mg" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Quantité par prise<select value={item.quantity} onChange={(e) => update(item.id, { quantity: Number(e.target.value) })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3">{QUANTITY_OPTIONS.map((quantity) => <option key={quantity} value={quantity}>{quantityLabel(quantity)}</option>)}</select></label>
+                <label className="text-sm font-bold">Forme<select value={item.form} onChange={(e) => update(item.id, { form: e.target.value })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"><option value="comprimé">Comprimé</option><option value="gélule">Gélule</option><option value="sachet">Sachet</option><option value="dose">Dose</option><option value="ml">ml</option><option value="autre">Autre</option></select></label>
+                <label className="text-sm font-bold">Horaires<input value={item.times.join(", ")} disabled={item.asNeeded} onChange={(e) => { const times = e.target.value.split(",").map((time) => time.trim()).filter(Boolean); update(item.id, { times, time: times[0] || item.time }); }} placeholder="08:00, 20:00" className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3 disabled:bg-surface-2" /></label>
+                <label className="text-sm font-bold">Unités par boîte<input value={item.unitsPerBox} type="number" min="1" max="500" onChange={(e) => update(item.id, { unitsPerBox: Math.max(1, Math.min(500, Number(e.target.value))) })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Alerte sous<input value={item.lowStockThreshold} type="number" min="0" max="500" onChange={(e) => update(item.id, { lowStockThreshold: Math.max(0, Math.min(500, Number(e.target.value))) })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Début<input value={item.startDate} type="date" onChange={(e) => update(item.id, { startDate: e.target.value })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Fin<input value={item.endDate} type="date" min={item.startDate} onChange={(e) => update(item.id, { endDate: e.target.value })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3" /></label>
+                <label className="text-sm font-bold">Par rapport au repas<select value={item.mealTiming} onChange={(e) => update(item.id, { mealTiming: e.target.value as PrescriptionItem["mealTiming"] })} className="mt-2 w-full rounded-xl border border-line-strong px-3 py-3"><option value="none">Non précisé</option><option value="before">Avant</option><option value="during">Pendant</option><option value="after">Après</option></select></label>
+                <label className="flex items-center gap-3 self-end rounded-xl bg-surface-3 p-3 text-sm font-bold"><input type="checkbox" checked={item.asNeeded} onChange={(e) => update(item.id, { asNeeded: e.target.checked, times: e.target.checked ? [] : item.times.length ? item.times : ["08:00"] })} className="h-5 w-5" />Si besoin, sans rappel</label>
               </div>
-              <div className="mt-4 rounded-2xl border border-[#cfe2d9] bg-[#f3f7f4] p-4">
+              <div className="mt-4 rounded-2xl border border-brand-soft bg-surface-3 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3"><MedicationVisual form={item.form} /><div><p className="font-black">Fiche médicament française</p><p className="text-sm font-medium text-[#60766e]">{item.cis ? `Liée au CIS ${item.cis} · ${item.activeSubstances}` : "Retrouvez la référence exacte avant de l’associer."}</p></div></div>
-                  <button type="button" onClick={() => lookup(item)} disabled={lookupLoading && lookupId === item.id} className="rounded-xl border border-[#90c8ae] bg-white px-4 py-3 text-sm font-black text-[#176b50] disabled:opacity-50">{lookupLoading && lookupId === item.id ? "Recherche…" : item.cis ? "Changer la référence" : "Rechercher la fiche"}</button>
+                  <div className="flex items-center gap-3"><MedicationVisual form={item.form} /><div><p className="font-bold">Fiche médicament française</p><p className="text-sm font-medium text-muted">{item.cis ? `Liée au CIS ${item.cis} · ${item.activeSubstances}` : "Retrouvez la référence exacte avant de l’associer."}</p></div></div>
+                  <button type="button" onClick={() => lookup(item)} disabled={lookupLoading && lookupId === item.id} className="rounded-xl border border-faint bg-white px-4 py-3 text-sm font-bold text-brand disabled:opacity-50">{lookupLoading && lookupId === item.id ? "Recherche…" : item.cis ? "Changer la référence" : "Rechercher la fiche"}</button>
                 </div>
-                {lookupId === item.id && <div className="mt-4 border-t border-[#dce7e2] pt-4">{lookupError && <p className="rounded-xl bg-[#fff0eb] p-3 text-sm font-bold text-[#a84747]">{lookupError}</p>}{lookupResults.length > 0 && <div className="space-y-2"><p className="text-xs font-black uppercase tracking-wider text-[#60766e]">Sélection obligatoire par l’aidant</p>{lookupResults.map((result) => <button type="button" key={result.cis} onClick={() => selectOfficial(item, result)} className="w-full rounded-xl border border-[#d5e2dc] bg-white p-3 text-left hover:border-[#90c8ae]"><span className="block font-black">{result.name}</span><span className="mt-1 block text-xs font-bold text-[#60766e]">{result.form} · {result.status} · CIS {result.cis}</span></button>)}</div>}<button type="button" onClick={() => { setLookupId(""); setLookupResults([]); }} className="mt-3 text-sm font-black text-[#60766e]">Fermer</button></div>}
-                <p className="mt-3 text-xs font-medium text-[#71847d]">Source : Base de données publique des médicaments. L’illustration indique seulement la forme et ne permet pas d’identifier un comprimé.</p>
-                {item.cis && <a href={officialNoticeUrl(item.cis)} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-[#17362d] px-4 text-sm font-black text-white">Ouvrir la notice officielle ↗</a>}
+                {lookupId === item.id && <div className="mt-4 border-t border-line pt-4">{lookupError && <p className="rounded-xl bg-danger-bg p-3 text-sm font-bold text-danger">{lookupError}</p>}{lookupResults.length > 0 && <div className="space-y-2"><p className="text-xs font-bold uppercase tracking-wider text-muted">Sélection obligatoire par l’aidant</p>{lookupResults.map((result) => <button type="button" key={result.cis} onClick={() => selectOfficial(item, result)} className="w-full rounded-xl border border-line bg-white p-3 text-left hover:border-faint"><span className="block font-bold">{result.name}</span><span className="mt-1 block text-xs font-bold text-muted">{result.form} · {result.status} · CIS {result.cis}</span></button>)}</div>}<button type="button" onClick={() => { setLookupId(""); setLookupResults([]); }} className="mt-3 text-sm font-bold text-muted">Fermer</button></div>}
+                <p className="mt-3 text-xs font-medium text-muted-2">Source : Base de données publique des médicaments. L’illustration indique seulement la forme et ne permet pas d’identifier un comprimé.</p>
+                {item.cis && <a href={officialNoticeUrl(item.cis)} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center rounded-xl bg-ink px-4 text-sm font-bold text-white">Ouvrir la notice officielle ↗</a>}
               </div>
-              <div className={`mt-4 rounded-2xl border p-4 ${item.stock <= item.lowStockThreshold ? "border-[#efc16d] bg-[#fff5dd]" : "border-[#dce7e2] bg-[#f3f7f4]"}`}>
+              <div className={`mt-4 rounded-2xl border p-4 ${item.stock <= item.lowStockThreshold ? "border-warn-border bg-warn-bg" : "border-line bg-surface-3"}`}>
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-wider text-[#71847d]">Stock disponible</p>
-                    <p className="mt-1 text-3xl font-black">{item.stock} <span className="text-base text-[#60766e]">unité{item.stock > 1 ? "s" : ""}</span></p>
-                    <p className="mt-1 text-sm font-bold text-[#60766e]">
+                    <p className="text-xs font-bold uppercase tracking-wider text-muted-2">Stock disponible</p>
+                    <p className="mt-1 text-3xl font-extrabold">{item.stock} <span className="text-base text-muted">unité{item.stock > 1 ? "s" : ""}</span></p>
+                    <p className="mt-1 text-sm font-bold text-muted">
                       {item.asNeeded || item.times.length === 0 ? "Autonomie non estimable pour un traitement si besoin" : `Environ ${Math.floor(item.stock / Math.max(.01, item.quantity * item.times.length * item.days.length / 7))} jour(s) d’autonomie`}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => update(item.id, { stock: Math.min(999, item.stock + item.unitsPerBox), stockUpdatedAt: new Date().toISOString() })} className="rounded-xl bg-[#176b50] px-4 py-3 text-sm font-black text-white">+ Ajouter une boîte</button>
-                    <button type="button" onClick={() => { const value = window.prompt("Nombre exact d’unités disponibles", String(item.stock)); const amount = Number(value?.replace(",", ".")); if (value !== null && Number.isFinite(amount) && amount >= 0) update(item.id, { stock: Math.min(999, Math.round(amount * 4) / 4), stockUpdatedAt: new Date().toISOString() }); }} className="rounded-xl border border-[#ccdcd5] bg-white px-4 py-3 text-sm font-black text-[#37554b]">Corriger le stock</button>
+                    <button type="button" onClick={() => update(item.id, { stock: Math.min(999, item.stock + item.unitsPerBox), stockUpdatedAt: new Date().toISOString() })} className="rounded-xl bg-brand px-4 py-3 text-sm font-bold text-white">+ Ajouter une boîte</button>
+                    <button type="button" onClick={() => { const value = window.prompt("Nombre exact d’unités disponibles", String(item.stock)); const amount = Number(value?.replace(",", ".")); if (value !== null && Number.isFinite(amount) && amount >= 0) update(item.id, { stock: Math.min(999, Math.round(amount * 4) / 4), stockUpdatedAt: new Date().toISOString() }); }} className="rounded-xl border border-line-strong bg-white px-4 py-3 text-sm font-bold text-ink-2">Corriger le stock</button>
                   </div>
                 </div>
               </div>
-              <fieldset className="mt-4"><legend className="text-sm font-black">Jours de prise</legend><div className="mt-2 flex flex-wrap gap-2">{["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((label, day) => <label key={label} className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-black ${item.days.includes(day) ? "border-[#90c8ae] bg-[#e2f5ea] text-[#176b50]" : "border-[#d5e2dc] text-[#60766e]"}`}><input type="checkbox" className="sr-only" checked={item.days.includes(day)} onChange={(e) => update(item.id, { days: e.target.checked ? [...item.days, day].sort() : item.days.filter((value) => value !== day) })} />{label}</label>)}</div></fieldset>
+              <fieldset className="mt-4"><legend className="text-sm font-bold">Jours de prise</legend><div className="mt-2 flex flex-wrap gap-2">{["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"].map((label, day) => <label key={label} className={`cursor-pointer rounded-xl border px-3 py-2 text-xs font-bold ${item.days.includes(day) ? "border-faint bg-brand-soft text-brand" : "border-line text-muted"}`}><input type="checkbox" className="sr-only" checked={item.days.includes(day)} onChange={(e) => update(item.id, { days: e.target.checked ? [...item.days, day].sort() : item.days.filter((value) => value !== day) })} />{label}</label>)}</div></fieldset>
             </article>
           ))}
         </div>
       )}
-      <button onClick={() => { setAddOpen(true); setAddError(""); setAddResults([]); }} className="mt-4 w-full rounded-2xl border-2 border-dashed border-[#90c8ae] bg-[#f7faf8] px-5 py-5 text-lg font-black text-[#176b50]">+ Rechercher et ajouter un médicament</button>
-      {items.length > 0 && <button onClick={save} className="mt-4 w-full rounded-2xl bg-[#176b50] px-5 py-4 text-lg font-black text-white shadow-[0_12px_28px_rgba(23,107,80,.2)]">Enregistrer et mettre à jour le programme Patient</button>}
-      {addOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#10271f]/60 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="add-medication-title">
+      <button onClick={() => { setAddOpen(true); setAddError(""); setAddResults([]); }} className="mt-4 w-full rounded-2xl border-2 border-dashed border-faint bg-surface-3 px-5 py-5 text-lg font-bold text-brand">+ Rechercher et ajouter un médicament</button>
+      {items.length > 0 && <button onClick={save} className="mt-4 w-full rounded-2xl bg-brand px-5 py-4 text-lg font-bold text-white shadow-[0_12px_28px_rgba(23,107,80,.2)]">Enregistrer et mettre à jour le programme Patient</button>}
+      {addOpen && <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-deep/60 p-0 backdrop-blur-sm sm:items-center sm:p-5" role="dialog" aria-modal="true" aria-labelledby="add-medication-title">
         <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-[2rem] bg-white p-5 shadow-2xl sm:rounded-[2rem] sm:p-7">
-          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-black uppercase tracking-[.14em] text-[#176b50]">Étape 1 sur 2</p><h2 id="add-medication-title" className="mt-1 text-2xl font-black">Quel médicament ajouter ?</h2><p className="mt-2 text-sm font-medium text-[#60766e]">Commencez par la référence officielle. La posologie sera demandée juste après.</p></div><button type="button" onClick={() => setAddOpen(false)} aria-label="Fermer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#edf2ef] text-xl font-black">×</button></div>
-          <form onSubmit={(event) => { event.preventDefault(); searchToAdd(); }} className="mt-6 flex flex-col gap-2 sm:flex-row"><label className="sr-only" htmlFor="medication-search">Nom du médicament</label><input id="medication-search" autoFocus value={addQuery} onChange={(event) => setAddQuery(event.target.value)} placeholder="Ex. Amoxicilline 500 mg" className="min-h-14 flex-1 rounded-2xl border-2 border-[#b8ccc3] px-4 text-lg font-bold outline-none focus:border-[#176b50]" /><button disabled={addLoading} className="min-h-14 rounded-2xl bg-[#176b50] px-6 font-black text-white disabled:opacity-50">{addLoading ? "Recherche…" : "Rechercher"}</button></form>
-          <p className="mt-2 text-xs font-bold text-[#71847d]">Astuce : ajoutez le dosage pour obtenir des résultats plus précis.</p>
-          {addError && <p className="mt-4 rounded-2xl bg-[#fff0eb] p-4 text-sm font-bold text-[#a84747]">{addError}</p>}
-          {addResults.length > 0 && <div className="mt-5 space-y-3"><p className="text-xs font-black uppercase tracking-wider text-[#60766e]">Choisissez la ligne inscrite sur la boîte ou l’ordonnance</p>{addResults.map((result) => <button type="button" key={result.cis} onClick={() => addItem(result)} className="flex w-full items-center gap-3 rounded-2xl border-2 border-[#e0e9e5] p-4 text-left hover:border-[#90c8ae] hover:bg-[#f7faf8]"><MedicationVisual form={result.form} /><span className="min-w-0 flex-1"><span className="block font-black leading-snug">{result.name}</span><span className="mt-1 block text-xs font-bold text-[#60766e]">{result.form} · {result.status} · CIS {result.cis}</span></span><span className="text-2xl font-black text-[#176b50]">›</span></button>)}</div>}
-          <p className="mt-5 border-t border-[#edf2ef] pt-4 text-xs font-medium text-[#71847d]">Données issues de la Base de données publique des médicaments. Vérifiez toujours la référence avant de continuer.</p>
+          <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[.14em] text-brand">Étape 1 sur 2</p><h2 id="add-medication-title" className="mt-1 text-2xl font-extrabold">Quel médicament ajouter ?</h2><p className="mt-2 text-sm font-medium text-muted">Commencez par la référence officielle. La posologie sera demandée juste après.</p></div><button type="button" onClick={() => setAddOpen(false)} aria-label="Fermer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-2 text-xl font-bold">×</button></div>
+          <form onSubmit={(event) => { event.preventDefault(); searchToAdd(); }} className="mt-6 flex flex-col gap-2 sm:flex-row"><label className="sr-only" htmlFor="medication-search">Nom du médicament</label><input id="medication-search" autoFocus value={addQuery} onChange={(event) => setAddQuery(event.target.value)} placeholder="Ex. Amoxicilline 500 mg" className="min-h-14 flex-1 rounded-2xl border-2 border-line-strong px-4 text-lg font-bold outline-none focus:border-brand" /><button disabled={addLoading} className="min-h-14 rounded-2xl bg-brand px-6 font-bold text-white disabled:opacity-50">{addLoading ? "Recherche…" : "Rechercher"}</button></form>
+          <p className="mt-2 text-xs font-bold text-muted-2">Astuce : ajoutez le dosage pour obtenir des résultats plus précis.</p>
+          {addError && <p className="mt-4 rounded-2xl bg-danger-bg p-4 text-sm font-bold text-danger">{addError}</p>}
+          {addResults.length > 0 && <div className="mt-5 space-y-3"><p className="text-xs font-bold uppercase tracking-wider text-muted">Choisissez la ligne inscrite sur la boîte ou l’ordonnance</p>{addResults.map((result) => <button type="button" key={result.cis} onClick={() => addItem(result)} className="flex w-full items-center gap-3 rounded-2xl border-2 border-surface-2 p-4 text-left hover:border-faint hover:bg-surface-3"><MedicationVisual form={result.form} /><span className="min-w-0 flex-1"><span className="block font-bold leading-snug">{result.name}</span><span className="mt-1 block text-xs font-bold text-muted">{result.form} · {result.status} · CIS {result.cis}</span></span><span className="text-2xl font-extrabold text-brand">›</span></button>)}</div>}
+          <p className="mt-5 border-t border-surface-2 pt-4 text-xs font-medium text-muted-2">Données issues de la Base de données publique des médicaments. Vérifiez toujours la référence avant de continuer.</p>
         </div>
       </div>}
     </section>
@@ -3234,67 +3263,67 @@ export default function Home() {
 
   if (!ready)
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f3f7f4] font-bold text-[#17362d]">
+      <main className="grid min-h-screen place-items-center bg-surface-3 font-bold text-ink">
         Chargement…
       </main>
     );
   if (!token)
     return (
-      <main className="grid min-h-screen place-items-center bg-[#f3f7f4] px-5 text-[#17362d]">
+      <main className="grid min-h-screen place-items-center bg-surface-3 px-5 text-ink">
         <section className="w-full max-w-md rounded-[2rem] bg-white p-8 text-center shadow-[0_20px_60px_rgba(23,54,45,.12)]">
-          <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#176b50] text-3xl font-black text-white">
+          <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-brand text-3xl font-extrabold text-white">
             M
           </span>
-          <h1 className="mt-5 text-3xl font-black">
+          <h1 className="mt-5 text-3xl font-extrabold">
             Créer votre espace familial
           </h1>
-          <p className="mt-3 font-medium leading-relaxed text-[#60766e]">
+          <p className="mt-3 font-medium leading-relaxed text-muted">
             Un lien privé reliera le téléphone du patient à celui de l’aidant.
             Utilisez uniquement des données fictives pendant ce pilote.
           </p>
           <button
             onClick={createFamily}
-            className="mt-7 w-full rounded-2xl bg-[#176b50] px-6 py-5 text-lg font-black text-white"
+            className="mt-7 w-full rounded-2xl bg-brand px-6 py-5 text-lg font-bold text-white"
           >
             Créer l’espace MedConnect
           </button>
         </section>
       </main>
     );
-  const navItems: { tab: Tab; label: string; icon: string }[] =
+  const navItems: { tab: Tab; label: string; icon: NavIconName }[] =
     role === "patient"
       ? [
-          { tab: "today", label: "Accueil", icon: "⌂" },
-          { tab: "medications", label: "Médicaments", icon: "✚" },
-          { tab: "history", label: "Historique", icon: "◷" },
-          { tab: "pilot", label: "Mon avis", icon: "◇" },
+          { tab: "today", label: "Accueil", icon: "home" },
+          { tab: "medications", label: "Médicaments", icon: "pill" },
+          { tab: "history", label: "Historique", icon: "clock" },
+          { tab: "pilot", label: "Mon avis", icon: "feedback" },
         ]
       : [
-          { tab: "today", label: "Vue", icon: "⌂" },
-          { tab: "profile", label: "Patient", icon: "◎" },
-          { tab: "treatments", label: "Traitements", icon: "✚" },
-          { tab: "history", label: "Historique", icon: "◷" },
-          { tab: "pilot", label: "Pilote", icon: "◇" },
+          { tab: "today", label: "Vue", icon: "home" },
+          { tab: "profile", label: "Patient", icon: "patient" },
+          { tab: "treatments", label: "Traitements", icon: "pill" },
+          { tab: "history", label: "Historique", icon: "clock" },
+          { tab: "pilot", label: "Pilote", icon: "feedback" },
         ];
   return (
-    <main className="min-h-screen text-[#17362d]">
+    <main className="min-h-screen text-ink">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-5 pb-4 pt-6">
         <Brand role={role} patientName={profile.firstName || "Patient"} />
-        <span className="rounded-full border border-[#dce7e2] bg-white px-3 py-2 text-xs font-black uppercase tracking-wide text-[#60766e] shadow-sm">
+        <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.12em] text-muted shadow-sm">
           Pilote familial
         </span>
       </header>
       {accessKey ? (
-        <div className="mx-auto mb-7 flex max-w-sm rounded-full border border-white bg-[#e7eeea]/90 p-1.5 shadow-[0_8px_25px_rgba(35,72,60,.06)]">
-          <button onClick={() => changeRole("aidant")} className={`flex-1 rounded-full px-4 py-2.5 text-sm font-black ${role === "aidant" ? "bg-white text-[#176b50] shadow-sm" : "text-[#687d75]"}`}>
+        <div className="mx-auto mb-7 flex max-w-sm rounded-full border border-white bg-surface-2/90 p-1.5 shadow-[0_8px_25px_rgba(35,72,60,.06)]">
+          <button onClick={() => changeRole("aidant")} className={`flex-1 rounded-full px-4 py-2.5 text-sm font-bold ${role === "aidant" ? "bg-surface text-brand shadow-sm" : "text-muted"}`}>
             Administration
           </button>
-          <button onClick={() => changeRole("patient")} className={`flex-1 rounded-full px-4 py-2.5 text-sm font-black ${role === "patient" ? "bg-white text-[#176b50] shadow-sm" : "text-[#687d75]"}`}>
+          <button onClick={() => changeRole("patient")} className={`flex-1 rounded-full px-4 py-2.5 text-sm font-bold ${role === "patient" ? "bg-surface text-brand shadow-sm" : "text-muted"}`}>
             Voir comme Patient
           </button>
         </div>
       ) : (
-        <div className="mx-auto mb-7 w-fit rounded-full bg-[#e2f5ea] px-4 py-2 text-sm font-black text-[#176b50]">
+        <div className="mx-auto mb-7 w-fit rounded-full bg-brand-soft px-4 py-2 text-sm font-bold text-brand">
           Accès Patient
         </div>
       )}
@@ -3304,13 +3333,13 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setTab("profile")}
-            className="mx-auto mb-5 flex w-[calc(100%-2.5rem)] max-w-3xl items-center justify-between gap-4 rounded-2xl border-2 border-[#efc16d] bg-[#fff5dd] p-4 text-left text-[#765b2b]"
+            className="mx-auto mb-5 flex w-[calc(100%-2.5rem)] max-w-3xl items-center justify-between gap-4 rounded-2xl border-2 border-warn-border bg-warn-bg p-4 text-left text-warn-ink"
           >
             <span>
-              <span className="block font-black">Fiche patient à compléter</span>
+              <span className="block font-bold">Fiche patient à compléter</span>
               <span className="mt-1 block text-sm font-medium">Ajoutez l’identité nécessaire avant de poursuivre le pilote.</span>
             </span>
-            <span className="shrink-0 font-black">Compléter →</span>
+            <span className="shrink-0 font-bold">Compléter →</span>
           </button>
         )}
       {tab === "profile" && role === "aidant" ? (
@@ -3384,7 +3413,7 @@ export default function Home() {
         />
       )}
       <nav className="fixed inset-x-0 bottom-0 z-40 px-3 pb-[max(.75rem,env(safe-area-inset-bottom))] pt-2">
-        <div className={`mx-auto grid max-w-xl overflow-hidden rounded-[1.65rem] border border-white/80 bg-[#17362d]/95 p-1.5 shadow-[0_18px_55px_rgba(18,47,39,.28)] backdrop-blur-xl ${role === "patient" ? "grid-cols-4" : "grid-cols-5"}`}>
+        <div className={`mx-auto grid max-w-xl overflow-hidden rounded-[1.65rem] border border-white/80 bg-ink/95 p-1.5 shadow-[0_18px_55px_rgba(18,47,39,.28)] backdrop-blur-xl ${role === "patient" ? "grid-cols-4" : "grid-cols-5"}`}>
           {navItems.map((item) => {
             const active = tab === item.tab;
             return (
@@ -3393,10 +3422,10 @@ export default function Home() {
                 type="button"
                 aria-current={active ? "page" : undefined}
                 onClick={() => setTab(item.tab)}
-                className={`flex min-w-0 flex-col items-center justify-center rounded-[1.2rem] px-1 py-2.5 ${active ? "bg-white text-[#176b50] shadow-sm" : "text-[#c6d8d1] hover:bg-white/10 hover:text-white"}`}
+                className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-[1.2rem] px-1 py-2.5 transition ${active ? "bg-surface text-brand shadow-sm" : "text-faint-2 hover:bg-white/10 hover:text-white"}`}
               >
-                <span className="text-xl font-black leading-none">{item.icon}</span>
-                <span className={`mt-1 max-w-full truncate text-[10px] font-black ${role === "patient" ? "sm:text-xs" : "sm:text-[11px]"}`}>{item.label}</span>
+                <NavIcon name={item.icon} className="h-[22px] w-[22px]" />
+                <span className={`max-w-full truncate text-[10px] font-bold ${role === "patient" ? "sm:text-xs" : "sm:text-[11px]"}`}>{item.label}</span>
               </button>
             );
           })}
